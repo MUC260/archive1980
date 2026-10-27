@@ -93,13 +93,19 @@
 
 ---
 
-## 六、部署（需你手动，约 3 分钟）
+## 六、部署（已完成）
 
-1. `github.com` → New repository → 名称 `archive1980` → **Public** → Create；
-2. **Add file → Upload files** → 拖入 `index.html`、`manifest.json`、`sw.js`、`assets/` → Commit；
-3. **Settings → Pages** → Source 选 `main` / `root` → Save → 等 1–2 分钟 → 得到 `https://用户名.github.io/archive1980/`。
+| 项 | 值 |
+|---|---|
+| 线上地址 | **<https://muc260.github.io/archive1980/>** |
+| 仓库 | <https://github.com/MUC260/archive1980>（Public） |
+| 分支 / 目录 | `main` / 根目录 |
+| 文件数 | 44（含 16 张图） |
+| 状态 | Pages 构建完成（`status=built`），首页与 16 张图实测 HTTP 200 |
 
-收尾：把真实网址回填到借书卡背面图与 `entry-kit.md` 的 5 处占位。
+发布方式：这台机器直连 `github.com` 网页端会超时，但 `api.github.com` 正常，所以用 `tools/deploy.ps1`
+走 GitHub REST API（本机已存的 git 凭据，用户 MUC260，带 repo 权限）推送，并调用 Pages API 开启站点。
+以后改完内容重跑一次即可。
 
 ---
 
@@ -119,9 +125,9 @@
 
 ## 八、已知限制
 
-1. 没有替你部署（无 GitHub 凭证）；
-2. 借书卡背面网址留白，部署后回填；
-3. `entry-kit.md` 里 5 处网址占位待替换；
+1. 已部署上线；后续更新需重跑 `tools/deploy.ps1`（或你自己 `git push`）；
+2. 借书卡背面网址已回填为真实地址；
+3. `entry-kit.md` 里 5 处网址占位已替换；
 4. 图片为 AI 生成，个别笔画仍有 AI 味；
 5. 第 6、9 步需要联网查真实资料，纯离线会卡住（设计如此）；
 6. 长按入口在极少数 iOS 版本可能要多试一次，点「重新加载」也可；

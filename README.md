@@ -74,10 +74,13 @@ python -m http.server 8080      # 或直接双击 index.html（无 PWA）
 
 ---
 
-## 五、部署
+## 五、部署（已完成）
 
-见 `DEPLOY.md`。三步：建 Public 仓库（建议 `archive1980`）→ 上传 `index.html`、`manifest.json`、`sw.js`、`assets/` → Settings → Pages → main / root → Save。
-部署完把真实网址回填到借书卡背面图与 `entry-kit.md` 的占位处。
+- **线上地址：<https://muc260.github.io/archive1980/>**
+- 仓库：<https://github.com/MUC260/archive1980>（Public，main 分支，Pages 走 root）
+
+更新线上版本：改完本地文件后，用 `tools/deploy.ps1` 重新推一次（走 GitHub API，用本机已存的凭据），
+或者用 `git push` / 网页上传。**记得把 `sw.js` 的 `CACHE_NAME` 版本号 +1**，否则老访客看到的是缓存旧版。
 
 ---
 
@@ -94,9 +97,9 @@ python -m http.server 8080      # 或直接双击 index.html（无 PWA）
 
 | # | 限制 |
 |---|---|
-| 1 | 没有替你部署（本会话无 GitHub 凭证），`DEPLOY.md` 是三步点选版 |
-| 2 | 借书卡背面网址留白，部署后回填 |
-| 3 | `entry-kit.md` 里 5 处 `【部署后的真实网址】` 是占位 |
+| 1 | 已部署在 GitHub Pages。这台机器直连 `github.com` 网页端会超时，但 `api.github.com` 与 `*.github.io` 正常，所以发布走 API（`tools/deploy.ps1`） |
+| 2 | 借书卡背面网址已回填为真实地址；换地址需重跑 `tools/write_url_on_card.py` |
+| 3 | `entry-kit.md` 里 5 处网址已替换成真实地址 |
 | 4 | 图片为 AI 生成，个别笔画仍有 AI 味 |
 | 5 | 第 6、9 步要联网查真实资料，纯离线环境下会卡住（这是设计的一部分） |
 | 6 | 长按入口在极少数 iOS 版本可能要多试一次；点「重新加载」也行 |
