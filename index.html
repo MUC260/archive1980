@@ -239,8 +239,65 @@ footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
   .cert{ border:1px solid #999; page-break-inside:avoid; }
 }
 
+/* ---------------- 栏目页（左侧栏目导航 + 右侧正文） ---------------- */
+.page-cols{ display:flex; gap:20px; align-items:flex-start; }
+.side-nav{ flex:0 0 208px; border:1px solid var(--line); }
+.side-nav .h{
+  padding:9px 14px; background:#eef3f9; border-bottom:1px solid var(--line);
+  color:var(--blue-d); font-weight:700; font-size:15px;
+}
+.side-nav ul{ list-style:none; margin:0; padding:6px 0; }
+.side-nav li a{
+  display:block; padding:7px 14px; font-size:13.5px; color:#333;
+  border-left:3px solid transparent;
+}
+.side-nav li a:hover{ background:#f7f8fa; text-decoration:none; }
+.side-nav li a.on{ border-left-color:var(--blue); background:#f2f6fb; color:var(--blue-d); }
+.page-main{ flex:1 1 auto; min-width:0; border:1px solid var(--line); }
+.page-main .h{
+  padding:10px 16px; border-bottom:1px solid var(--line); background:#f7f8fa;
+  font-size:16px; color:var(--blue-d); font-weight:700;
+}
+.page-main .b{ padding:16px 18px; font-family:var(--font-doc); font-size:15px; line-height:2; color:#222; }
+.page-meta{
+  font-family:var(--font-ui); font-size:12.5px; color:var(--gray);
+  padding-bottom:10px; margin-bottom:12px; border-bottom:1px dotted var(--line);
+}
+/* 正文里的普通列表 */
+ul.plain{ list-style:none; margin:.6em 0; padding-left:0; }
+ul.plain li{ position:relative; padding-left:1.1em; margin:.25em 0; }
+ul.plain li::before{ content:"·"; position:absolute; left:.25em; color:#999; }
+ol.plain{ margin:.6em 0; padding-left:1.8em; }
+ol.plain li{ margin:.25em 0; }
+.page-main .b table.doc-table{ font-size:14px; }
+/* 登录表单（仅“用户登录”一页用） */
+.login-form{ margin:.6em 0 1em; max-width:420px; }
+.login-form input{
+  font-family:var(--font-doc); font-size:15px; padding:5px 8px; width:190px;
+  border:1px solid #b9c4d2; outline:none; background:#fff;
+}
+.login-form button{
+  background:var(--blue); color:#fff; border:0; padding:6px 22px; font-size:14px;
+  font-family:var(--font-ui); cursor:pointer;
+}
+.login-form button:hover{ background:var(--blue-d); }
+.login-msg{ font-family:var(--font-ui); color:var(--red); font-size:13px; margin:8px 0 0; }
+
+/* 页头辅助工具 */
+.head-right .tools .fs a{ padding:0 3px; }
+.head-right .tools .fs a.cur{ color:var(--blue-d); font-weight:700; text-decoration:none; }
+/* 字号调节：整站缩放 */
+body.fs-s .wrap{ zoom:.92; }
+body.fs-l .wrap{ zoom:1.12; }
+
 /* 手机 */
 @media (max-width:640px){
+  .page-cols{ display:block; }
+  .side-nav{ flex:none; margin-bottom:14px; }
+  .side-nav ul{ display:flex; flex-wrap:wrap; padding:4px; }
+  .side-nav li{ width:50%; }
+  .side-nav li a{ border-left:0; border-bottom:2px solid transparent; padding:6px 8px; font-size:13px; }
+  .side-nav li a.on{ border-left:0; border-bottom-color:var(--blue); }
   .site-head{ padding:14px 14px 12px; gap:10px; }
   .brand img{ width:40px; height:40px; }
   .brand h1{ font-size:20px; letter-spacing:.08em; }
@@ -275,17 +332,23 @@ footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
     </div>
     <div class="head-right">
       <div class="clock" id="sysClock">系统时间：1980-08-04 06:00</div>
-      <div class="tools"><a href="#" onclick="return false">无障碍浏览</a> | <a href="#" onclick="return false">繁体</a> | <a href="#" onclick="return false">登录</a></div>
+      <div class="tools">
+        <span class="fs">字号：<a href="#" data-fs="s">小</a><a href="#" data-fs="m">中</a><a href="#" data-fs="l">大</a></span>
+        &nbsp;|&nbsp;<a href="#" data-page="site-map">网站地图</a>
+        &nbsp;|&nbsp;<a href="#" data-page="about-contact">联系我们</a>
+        &nbsp;|&nbsp;<a href="#" data-page="login">登录</a>
+      </div>
     </div>
   </header>
 
   <!-- ======================= 导航 ======================= -->
   <nav class="nav" id="nav">
-    <a href="#" data-view="home">首页</a>
-    <a href="#" data-view="about">本馆概况</a>
-    <a href="#" data-view="search">馆藏检索</a>
-    <a href="#" data-view="service">利用服务</a>
-    <a href="#" data-view="law">政策法规</a>
+    <a href="#" data-view="home" data-sec="home">首　页</a>
+    <a href="#" data-page="about-intro" data-sec="about">本馆概况</a>
+    <a href="#" data-view="search" data-sec="holdings">馆藏检索</a>
+    <a href="#" data-page="svc-notice" data-sec="service">利用服务</a>
+    <a href="#" data-page="law-list" data-sec="law">政策法规</a>
+    <a href="#" data-page="site-map" data-sec="map">网站地图</a>
   </nav>
 
   <div class="crumb" id="crumb">当前位置：<b>首页</b></div>
@@ -416,6 +479,12 @@ footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
       <p class="no-print" style="margin-top:22px;"><a href="#" data-view="search">← 返回检索结果</a></p>
     </section>
 
+    <!-- ---------- 栏目页 / 公告详情 / 法规详情 / 登录 ---------- -->
+    <section class="view" id="view-page" hidden>
+      <div id="pageWrap"></div>
+      <p class="no-print" style="margin-top:22px;"><a href="#" data-view="home">← 返回首页</a></p>
+    </section>
+
   </main>
 
   <!-- ======================= 页脚 ======================= -->
@@ -429,6 +498,15 @@ footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
       <span>建议使用 1024×768 以上分辨率浏览</span>
       <span>本平台由县档案馆技术室维护</span>
     </div>
+    <div class="row links" style="margin-top:8px;">
+      <a href="#" data-page="site-map">网站地图</a>
+      <a href="#" data-page="help">使用帮助</a>
+      <a href="#" data-page="privacy">隐私声明</a>
+      <a href="#" data-page="access">无障碍声明</a>
+      <a href="#" data-page="about-contact">联系我们</a>
+      <a href="#" data-page="login">用户登录</a>
+    </div>
+    <div class="disc">秦档网备 1980-001 号　本平台由县档案馆技术室维护</div>
     <div class="disc" id="footerNote"></div>
   </footer>
 </div>
@@ -594,6 +672,9 @@ footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
   "footerNote": "本站为虚构作品，与任何真实档案馆及机构无关。"
 };
 
+  /* 栏目页 / 公告 / 法规内容（构建时注入） */
+  var PAGES = {"nav":[{"key":"about","name":"本馆概况","items":["about-intro","about-org","about-holdings","about-guide"]},{"key":"holdings","name":"馆藏检索","items":["search-open","search-topic"]},{"key":"service","name":"利用服务","items":["svc-notice","svc-flow","svc-fee","svc-faq","svc-form"]},{"key":"law","name":"政策法规","items":["law-list"]}],"pages":{"about-intro":{"title":"本馆简介","html":"<p class=\"doc-p\">秦巴县地处秦巴山区腹地，汉江自西向东穿境而过，境内山高谷深，沟溪密布。洞河与汝河于洞河镇一带汇入汉江，沿江旧有渡口数处，为山区群众往来要道。</p><p class=\"doc-p\">本馆于1958年建馆，初设于城关镇人民路，1980年迁入现址，为县级综合档案馆，是全县档案保管、利用与编研的中心。馆藏起止年代为1935年至1980年，共3.2万卷（件），其中永久卷1.1万卷，另有资料4700册。馆藏以民国时期文书及建国后机关、团体、企事业单位档案为主，兼收水文、气象、图书等专门材料，较完整地反映了本县四十余年间行政区划、农业生产、水利建设与社会生活的变迁。</p><p class=\"doc-p\">2026年3月，本馆启动馆藏档案数字化工作，首批完成文书档案的扫描与著录，开放目录同步上线。纸质原件仍以到馆查阅为准。</p>"},"about-org":{"title":"机构设置","html":"<p class=\"doc-p\">本馆设办公室、管理利用科、技术科、编研科四个科室，现有工作人员十九人，其中大专以上文化程度十一人。各科室职责如下：</p><table class=\"doc-table\"><thead><tr><th>科室</th><th>负责人</th><th>人数</th><th>职责</th></tr></thead><tbody><tr><td>办公室</td><td>李守信</td><td>5</td><td>负责文秘、财务、后勤与安全保卫，管理印章、介绍信及对外接待。</td></tr><tr><td>管理利用科</td><td>王秀云</td><td>7</td><td>负责档案接收、整理、编目、保管、调卷与查阅接待。</td></tr><tr><td>技术科</td><td>周志远</td><td>4</td><td>负责库房温湿度控制、消毒杀虫、修裱复制与数字化加工。</td></tr><tr><td>编研科</td><td>何清和</td><td>3</td><td>负责史料编纂、专题汇编、展览陈列与业务培训。</td></tr></tbody></table><p class=\"doc-p\">各科室实行岗位责任制，业务上受上级档案行政管理部门指导。馆务会议由馆长主持，每季度召开一次，研究馆藏建设、开放鉴定与经费使用等事项；重大事项报县主管部门批准。</p>"},"about-holdings":{"title":"馆藏介绍","html":"<p class=\"doc-p\">本馆馆藏按门类分为文书、会计、科技、照片、音像及资料六类，以文书档案为主体，会计与科技档案次之。民国时期文书多已修裱，建国后档案按年度—机构分类排列，编有案卷目录、全引目录及人名索引各一套。1980年起对破损卷页进行抢救性复制，累计修裱3200余页。</p><table class=\"doc-table\"><thead><tr><th>门类</th><th>数量</th><th>起止年度</th><th>开放情况</th></tr></thead><tbody><tr><td>文书档案</td><td>2.4万卷</td><td>1935—1980</td><td>已开放</td></tr><tr><td>会计档案</td><td>4200卷</td><td>1953—1980</td><td>部分开放</td></tr><tr><td>科技档案</td><td>1100卷</td><td>1958—1980</td><td>部分开放</td></tr><tr><td>照片档案</td><td>860张</td><td>1949—1980</td><td>已开放</td></tr><tr><td>音像档案</td><td>120盘</td><td>1972—1980</td><td>暂不开放</td></tr><tr><td>资料</td><td>4700册</td><td>1935—1980</td><td>开架查阅</td></tr></tbody></table><p class=\"doc-p\">未开放部分主要为涉及个人隐私、未结案件及产权纠纷的案卷，须经形成单位同意后调阅。</p>"},"about-guide":{"title":"查档指南","html":"<p class=\"doc-p\">到馆查档按以下四步办理，一般当班即可办结。</p><ol class=\"plain\"><li><strong>登记</strong>：持本人身份证、工作证或单位介绍信到查阅室，填写《档案查阅登记表》，注明查阅目的与范围。</li><li><strong>检索</strong>：由工作人员代为调取目录，或使用查阅室终端按全文、档号、题名、责任者检索，确定所需案卷。</li><li><strong>调卷</strong>：填写调卷单，交工作人员入库存取；一次调卷不超过五卷，阅毕当即归还。</li><li><strong>复制</strong>：需复制、摘抄的，填写复制申请单，经核准后由工作人员代办，并加盖证明章。</li></ol><p class=\"doc-p\">查阅开放档案不收费；查阅未开放档案，须经形成单位书面同意。午休时间（十一时三十分至十四时三十分）暂停调卷，可预约下午场次。</p>"},"about-contact":{"title":"联系我们","html":"<table class=\"doc-table\"><thead><tr><th>项目</th><th>内容</th></tr></thead><tbody><tr><td>地址</td><td>秦巴县城关镇人民路17号</td></tr><tr><td>查阅室电话</td><td>0915-6223148</td></tr><tr><td>传真</td><td>0915-6223150</td></tr><tr><td>邮编</td><td>725300</td></tr><tr><td>电子邮箱</td><td>qbx-dangan@163.com</td></tr><tr><td>乘车路线</td><td>县城2路公交「档案馆」站下车，西行100米</td></tr><tr><td>开放时间</td><td>周一至周五 8:00—11:30、14:30—17:30，法定节假日除外</td></tr></tbody></table><p class=\"doc-p\">来访须知：来馆查阅请先在一楼值班室登记，凭登记单进入二楼查阅室。馆内禁止吸烟、饮食；包裹、雨具请存于门厅寄存处，不得携入库房区域。团体来访请提前一日电话联系，以便安排工作人员接待。</p>"},"search-open":{"title":"开放目录","html":"<p class=\"doc-p\">下表所列为本馆已编目并可供检索的全宗，按全宗号排列。</p><table class=\"doc-table\"><thead><tr><th>全宗号</th><th>全宗名称</th><th>起止年度</th><th>案卷数</th><th>开放情况</th></tr></thead><tbody><tr><td>001</td><td>秦巴县人民政府</td><td>1949—1980</td><td>3862卷</td><td>已开放</td></tr><tr><td>002</td><td>秦巴县广播站</td><td>1956—1980</td><td>614卷</td><td>部分开放</td></tr><tr><td>003</td><td>秦巴县水利局</td><td>1956—1980</td><td>1128卷</td><td>已开放</td></tr><tr><td>004</td><td>秦巴县民政局</td><td>1950—1980</td><td>986卷</td><td>已开放</td></tr><tr><td>005</td><td>秦巴县农业局</td><td>1952—1980</td><td>1547卷</td><td>已开放</td></tr><tr><td>006</td><td>秦巴县图书馆</td><td>1956—1980</td><td>372卷</td><td>已开放</td></tr><tr><td>007</td><td>秦巴县供销社</td><td>1951—1980</td><td>1205卷</td><td>部分开放</td></tr><tr><td>008</td><td>秦巴县教育局</td><td>1949—1980</td><td>1340卷</td><td>已开放</td></tr><tr><td>009</td><td>秦巴县卫生局</td><td>1953—1980</td><td>742卷</td><td>部分开放</td></tr></tbody></table><p class=\"doc-p\">未开放档案须经形成单位书面同意，并说明查阅目的，方可调阅。全宗内案卷目录可在查阅室查阅，电子目录陆续上线。1980年以后形成的档案尚未到开放期限，暂不列入本表。</p>"},"search-topic":{"title":"专题档案","html":"<div class=\"doc-title\">土地改革档案专题（1951—1953）</div><p class=\"doc-p\">收录本县土改期间形成的清册、登记表、会议记录及成分划定材料，共142卷。内容涉及全县土地丈量、分配、发证及遗留问题处理，附分户清册与地块图若干，是研究本县农村生产关系变革的基础材料。</p><div class=\"doc-title\">知识青年上山下乡档案专题（1968—1978）</div><p class=\"doc-p\">收录知青安置名册、口粮供应、住房修建、招工返城审批等材料，共86卷。涉及本县各公社接收的城镇青年及其安置点分布，另存照片43张，记录了当时的劳动与生活情形。</p><div class=\"doc-title\">农田水利建设档案专题（1958—1980）</div><p class=\"doc-p\">收录渠道岁修、塘库修建、水土保持及防汛岁修等材料，共213卷，附工程图纸47张。内容反映本县沿江各社队水利工程的立项、施工与验收过程。</p>"},"svc-notice":{"title":"查档须知","html":"<ol class=\"plain\"><li>查阅档案须持本人身份证、工作证或单位介绍信，经登记后方可进入查阅室。</li><li>查阅开放档案免收服务费；查阅未开放档案，须经形成单位书面同意。</li><li>每人每次调卷不超过五卷，阅毕当即归还，不得携出查阅室或转借他人。</li><li>需要复制的，填写复制申请单，经核准后由工作人员代办，不得自行拍摄。</li><li>复印按页计费，收费标准见本栏目「收费标准」页；档案证明另收工本费。</li><li>查阅室内禁止吸烟、饮食、喧哗，禁止在档案上折角、批注、涂改。</li><li>午休时间（十一时三十分至十四时三十分）暂停调卷，可预约下午场次。</li></ol><p class=\"doc-p\">违反上述规定，造成档案损毁、丢失的，按有关规定处理；情节严重的，依法追究责任。</p>"},"svc-flow":{"title":"办事流程","html":"<table class=\"doc-table\"><thead><tr><th>步骤</th><th>办理内容</th><th>办理地点</th><th>时限</th></tr></thead><tbody><tr><td>一、登记</td><td>交验身份证或单位介绍信，填写查阅登记表</td><td>二楼查阅室</td><td>即时</td></tr><tr><td>二、检索</td><td>查阅目录或使用终端检索，确定档号与题名</td><td>二楼查阅室</td><td>30分钟内</td></tr><tr><td>三、调卷</td><td>填写调卷单，注明档号、卷号及用途</td><td>二楼查阅室</td><td>当班</td></tr><tr><td>四、阅览</td><td>在指定位置阅读，登记摘录内容</td><td>二楼查阅室</td><td>当班</td></tr><tr><td>五、复制出证</td><td>填写复制申请单，缴费、盖章、领取</td><td>一楼复印室</td><td>1个工作日</td></tr></tbody></table><p class=\"doc-p\">需查阅未开放档案的，另需提交形成单位同意函，办理时限相应延长。跨馆查阅请提前函商，本馆代为查询后答复。</p>"},"svc-fee":{"title":"收费标准","html":"<table class=\"doc-table\"><thead><tr><th>项目</th><th>单位</th><th>价格</th></tr></thead><tbody><tr><td>静电复印（A4、单面）</td><td>页</td><td>0.50元</td></tr><tr><td>打印（A4）</td><td>页</td><td>1.00元</td></tr><tr><td>扫描（A4）</td><td>页</td><td>2.00元</td></tr><tr><td>档案证明</td><td>份</td><td>10.00元</td></tr><tr><td>缩微品复制</td><td>幅</td><td>3.00元</td></tr><tr><td>查档服务费</td><td>次</td><td>免收</td></tr><tr><td>邮寄（挂号）</td><td>件</td><td>按邮政标准</td></tr></tbody></table><p class=\"doc-p\">上列标准依据县物价局1980年核定标准执行，如有调整，以本馆公告为准。查阅开放档案、开具查档证明的工本费按实际发生计收，其余不另收费。</p><div class=\"doc-note\">收费一律开具收据，请妥善保存。</div>"},"svc-faq":{"title":"常见问题","html":"<p class=\"doc-p\"><strong>问：档案馆能查到什么？</strong><br>答：本馆保管全县机关、团体、企事业单位移交的档案，涉及行政区划、土地、水利、教育、卫生及人员名册等，可查本人学历、工龄、房产及社队历史情况。</p><p class=\"doc-p\"><strong>问：到馆查阅需要预约吗？</strong><br>答：个人查阅不需预约。团体查阅或一次调卷较多的，宜提前一日电话联系查阅室。</p><p class=\"doc-p\"><strong>问：可以在查阅室拍照吗？</strong><br>答：不得自行拍摄。需留存影像的，可申请扫描或复印，由工作人员代办。</p><p class=\"doc-p\"><strong>问：亲属可以代查吗？</strong><br>答：可以。代查人须持本人身份证及与查阅人的关系证明，并出示查阅人书面委托。</p><p class=\"doc-p\"><strong>问：档案可以外借吗？</strong><br>答：档案原件一律不外借。确需使用的，可申请复制件或档案证明。</p><p class=\"doc-p\"><strong>问：找不到需要的档案怎么办？</strong><br>答：可先查阅全宗介绍与案卷目录，或向编研科提出专题咨询，由工作人员协助查找。</p>"},"svc-form":{"title":"表格下载","html":"<div class=\"doc-title\">一、《档案查阅登记表》</div><p class=\"doc-p\">用于到馆查阅登记，填写查阅人姓名、证件号码、工作单位、查阅目的与范围，一次一表。</p><div class=\"doc-title\">二、《档案复制申请单》</div><p class=\"doc-p\">用于复印、打印、扫描申请，须注明档号、卷号、页数与用途，经档案室核准后办理。</p><div class=\"doc-title\">三、《档案证明申请表》</div><p class=\"doc-p\">用于开具学历、工龄、房产、社队历史等事项的档案证明，须附相关证件复印件。</p><p class=\"doc-p\">以上表格可在查阅室免费领取，也可自行下载打印。填写一律用蓝黑墨水钢笔或签字笔，不得使用铅笔。</p>"},"law-list":{"title":"法律法规","html":"<p class=\"doc-p\">本栏目收录与档案工作有关的法律、行政法规及部门规章，供查阅者了解档案的开放、利用与保密规定。所列条文为要点摘录，具体适用以正式文本为准。</p><p class=\"doc-p\">本栏目所列法规可在查阅室查阅全文。</p><div class=\"doc-note\">法规文本以正式颁布的版本为准，摘录内容如有出入，以原文为准。</div>"},"site-map":{"title":"网站地图","html":"<ul class=\"plain\"><li>首页</li><li>本馆概况<ul class=\"plain\"><li>本馆简介</li><li>机构设置</li><li>馆藏介绍</li><li>查档指南</li></ul></li><li>馆藏检索<ul class=\"plain\"><li>开放目录</li><li>专题档案</li></ul></li><li>利用服务<ul class=\"plain\"><li>查档须知</li><li>办事流程</li><li>收费标准</li><li>常见问题</li><li>表格下载</li></ul></li><li>政策法规<ul class=\"plain\"><li>法律法规</li></ul></li><li>联系我们</li><li>网站地图</li><li>使用帮助</li><li>隐私声明</li><li>无障碍声明</li><li>用户登录</li></ul>"},"help":{"title":"使用帮助","html":"<p class=\"doc-p\">本站检索框支持四项检索：全文、档号、题名、责任者。已知档号的，选「档号」直接输入；只记得单位或人物的，选「责任者」或「全文」，用较短的词试查，如单位简称、人名全名。关键词过长往往查不到结果，可去掉年份、地名等修饰语再试。</p><p class=\"doc-p\">检索结果按档号排列，点击条目可展开全文。若某份扫描件打不开或显示损坏，多为数字化加工时原件破损所致，可改查同卷其他条目，或到馆查阅纸质原件。</p><p class=\"doc-p\">本站的检索进度保存在本机浏览器中，更换设备或清除浏览数据后需重新检索。页面右上角可调节字号，环境音开关状态同样记在本机。</p>"},"privacy":{"title":"隐私声明","html":"<p class=\"doc-p\">本站为档案目录与原文发布平台，不设注册，不收集查阅者的姓名、身份证号、联系方式等个人信息。</p><p class=\"doc-p\">检索记录、已查阅条目等数据仅保存在查阅者本机浏览器中，不上传、不汇总，本馆无法获取。本站不设置用于跨站追踪的 cookie，不接入第三方统计与广告服务。</p><p class=\"doc-p\">到馆查阅时填写的《档案查阅登记表》为纸质件，按档案管理规定专柜保存，不用于其他用途。如需查询或更正本人相关信息，可与办公室联系。</p>"},"access":{"title":"无障碍声明","html":"<p class=\"doc-p\">本站按无障碍访问要求编制，正文采用较大字号与高对比度配色，主要功能均可键盘操作：使用 Tab 键在检索框、按钮与条目间移动，回车键确认。</p><p class=\"doc-p\">页面右上角设「字号」调节，可在大、中、小三档间切换，设置存于本机。建议使用 1024×768 以上分辨率浏览；使用读屏软件时，建议关闭动画效果，以获得更稳定的朗读顺序。</p>"},"login":{"title":"用户登录","html":"<form class=\"login-form\" method=\"post\" action=\"#\"><p class=\"doc-p\">用户名　<input id=\"loginUser\" name=\"loginUser\" type=\"text\" autocomplete=\"off\" /></p><p class=\"doc-p\">密　码　<input id=\"loginPass\" name=\"loginPass\" type=\"password\" /></p><p class=\"doc-p\"><button type=\"submit\">登 录</button></p></form><p class=\"doc-p\">本系统仅向馆内工作人员开放，账号由办公室统一分配。如忘记密码请与办公室联系（内线 8021）。</p><p class=\"doc-p\">登录后可按权限进行著录、调卷登记与数据维护，各项操作均留痕，请妥善保管账号，不得转借他人使用。</p>"}},"notices":[{"id":"n1","no":"秦档发〔1980〕7号","date":"1980-08-01","title":"关于调整档案查阅时间的通知","html":"<p class=\"doc-p\">各机关、团体、企事业单位：</p><p class=\"doc-p\">为便于各单位查阅利用档案，经馆务会议研究，自1980年8月1日起，本馆查阅室开放时间调整为上午八时至十一时三十分、下午二时三十分至五时三十分。星期日及法定节假日不开放，午休时间暂停调卷。</p><p class=\"doc-p\">查阅开放档案，凭本人身份证或单位介绍信登记后即可办理；查阅未开放档案，须经形成单位书面同意。团体查阅或一次调卷较多的，请提前一日与查阅室联系，以便安排工作人员。</p><p class=\"doc-p\">特此通知。</p><div class=\"doc-sign\">秦巴县档案馆　一九八〇年八月一日</div>"},{"id":"n2","no":"秦档发〔1980〕8号","date":"1980-08-04","title":"闭馆整库通知","html":"<p class=\"doc-p\">各有关单位：</p><p class=\"doc-p\">为改善库房保管条件，本馆定于1980年8月6日至8月20日闭馆整库，进行档案除尘、倒架及库房温湿度检测。整库期间暂停查阅与外借，急件请与档案室联系，由值班人员登记后另行安排。</p><p class=\"doc-p\">整库期间，查阅室仅受理电话咨询与预约登记，不办理调卷、复制业务。8月21日起恢复正常，此前预约的查阅事项顺延办理。</p><p class=\"doc-p\">特此通知。</p><div class=\"doc-sign\">秦巴县档案馆　一九八〇年八月四日</div>"},{"id":"n3","no":"秦档发〔1980〕9号","date":"1980-08-05","title":"关于开展1980年度文书立卷归档工作的通知","html":"<p class=\"doc-p\">各机关、团体、企事业单位：</p><p class=\"doc-p\">1980年度文书立卷归档工作即将开始。各单位应于九月底前完成本年度文件材料的收集、整理、立卷与归档，案卷质量按《文书档案保管期限表》执行，永久、长期、短期卷分别排列，卷内目录填写齐全，不得使用铅笔编号。</p><p class=\"doc-p\">凡涉及机构变动、区划调整的单位，应先将撤并前的档案整理移交，不得分散保存。本馆自十月起组织检查，检查结果予以通报。</p><p class=\"doc-p\">特此通知。</p><div class=\"doc-sign\">秦巴县档案馆　一九八〇年八月五日</div>"},{"id":"n4","no":"秦档发〔1980〕12号","date":"1980-08-12","title":"关于档案复制收费的通知","html":"<p class=\"doc-p\">各机关、团体、企事业单位：</p><p class=\"doc-p\">为合理使用复制设备，经县物价局核定，自即日起，本馆档案复制按下列标准收费：静电复印每页一角五分，缩微拍照另计，档案证明每份一元。查阅开放档案的服务费免收。</p><p class=\"doc-p\">复制须填写复制申请单，经档案室核准后由工作人员代办，不得自行拍摄。复制件加盖本馆证明章后方具效力，未盖章者不作凭证使用。</p><p class=\"doc-p\">特此通知。</p><div class=\"doc-sign\">秦巴县档案馆　一九八〇年八月十二日</div>"},{"id":"n5","no":"秦档办〔1980〕15号","date":"1980-08-18","title":"关于开展库房温湿度检测的通知","html":"<p class=\"doc-p\">各科室：</p><p class=\"doc-p\">为掌握库房温湿度变化，做好防潮防虫工作，定于每月十日上午检测一至三号库房，检测内容包括温度、相对湿度、墙体含水与虫蛀情况，结果登记入册并报馆务会议。</p><p class=\"doc-p\">检测期间暂停调卷，各科室应提前一日报送借卷计划，将待调案卷集中登记，以免影响查阅。发现异常情况，技术科应于三日内提出处理意见。</p><p class=\"doc-p\">特此通知。</p><div class=\"doc-sign\">秦巴县档案馆办公室　一九八〇年八月十八日</div>"}],"laws":[{"id":"l1","title":"中华人民共和国档案法","meta":"1987年9月5日第六届全国人民代表大会常务委员会第二十二次会议通过","html":"<p class=\"doc-p\">要点摘录：</p><ol class=\"plain\"><li>国家档案馆保管的档案，一般自形成之日起满三十年向社会开放。</li><li>经济、科学、技术、文化等类档案，可少于三十年向社会开放。</li><li>涉及国家安全或重大利益、到期不宜开放的档案，可多于三十年。</li><li>查阅利用开放档案，须持合法证明；复制须经档案馆同意。</li><li>档案馆应为档案利用创造条件，简化手续，提供方便。</li><li>禁止擅自销毁、涂改、伪造、出卖或转让档案。</li><li>违反规定造成档案损失的，依法追究法律责任。</li></ol><div class=\"doc-note\">摘录自正式颁布文本，全文可在查阅室查阅。</div>"},{"id":"l2","title":"机关档案工作条例","meta":"国家档案局 1983 年发布","html":"<p class=\"doc-p\">要点摘录：</p><ol class=\"plain\"><li>机关档案工作是机关工作的组成部分，由机关档案部门统一管理。</li><li>各机关应建立文书立卷归档制度，按期完成上年度文件归档。</li><li>案卷质量按《文书档案保管期限表》划分永久、长期、短期。</li><li>机关档案部门应编制案卷目录、全引目录等检索工具。</li><li>机关应设专用库房，做好防火、防潮、防虫、防盗工作。</li><li>撤销机关的档案，应向同级档案馆移交，不得分散保存。</li></ol><div class=\"doc-note\">摘录自正式颁布文本，全文可在查阅室查阅。</div>"},{"id":"l3","title":"档案馆工作通则","meta":"国家档案局 1983 年发布","html":"<p class=\"doc-p\">要点摘录：</p><ol class=\"plain\"><li>档案馆是永久保管档案的基地，是各方面利用档案的中心。</li><li>档案馆按规定的年限和范围，接收本级各单位移交的档案。</li><li>馆藏档案应划分全宗，按全宗进行整理、编目与保管。</li><li>档案馆应编制必要的检索工具，逐步实现检索现代化。</li><li>档案馆应开展编研与展览，主动提供利用，做好查阅接待。</li><li>档案库房应保持适宜温湿度，做好防火、防盗、防虫、防霉。</li><li>未经批准，任何人不得将馆藏档案携出馆外。</li></ol><div class=\"doc-note\">摘录自正式颁布文本，全文可在查阅室查阅。</div>"}]};
+
   /* ---------- 本地存储 ---------- */
   var KEY = 'qinba_archive_v2';
   var DEFAULT = {
@@ -664,10 +745,10 @@ footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
   }
 
   /* ---------- 视图切换 ---------- */
-  var VIEWS = ['home', 'about', 'search', 'service', 'law', 'doc'];
+  var VIEWS = ['home', 'about', 'search', 'service', 'law', 'doc', 'page'];
   var CRUMBS = {
     home: '首页', about: '本馆概况', search: '馆藏检索',
-    service: '利用服务', law: '政策法规', doc: '馆藏检索'
+    service: '利用服务', law: '政策法规', doc: '馆藏检索', page: '本馆概况'
   };
 
   function show(view, crumbExtra) {
@@ -713,11 +794,20 @@ footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
       li0.textContent = '欢迎回来，陈望。';
       list.appendChild(li0);
     }
-    (SITE.notices || []).forEach(function (n) {
-      var li = document.createElement('li');
-      li.innerHTML = '<a href="#" onclick="return false">' + esc(n) + '</a>';
-      list.appendChild(li);
-    });
+    if (PAGES.notices && PAGES.notices.length) {
+      PAGES.notices.forEach(function (n) {
+        var li = document.createElement('li');
+        li.innerHTML = '<a href="#" data-page="notice-' + esc(n.id) + '">' + esc(n.title) + '</a>' +
+          (n.date ? '<span class="date">' + esc(n.date) + '</span>' : '');
+        list.appendChild(li);
+      });
+    } else {
+      (SITE.notices || []).forEach(function (n) {
+        var li = document.createElement('li');
+        li.innerHTML = '<span>' + esc(n) + '</span>';
+        list.appendChild(li);
+      });
+    }
   }
 
   /* ---------- 检索规则 ----------
@@ -755,7 +845,7 @@ footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
   }
 
   /* 检索：命中规则 → 返回对应档案；另外把已打开过、且元数据里含关键词的档案一并列出（像真检索一样） */
-  function search(q) {
+  function search(q, field) {
     var n = norm(q);
     var hits = [];
     if (!n) { return hits; }
@@ -773,12 +863,16 @@ footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
       break;
     }
 
-    /* 2) 已公开档案里的元数据/全文命中 */
-    state.opened.forEach(function (id) {
+    /* 2) 已调出过的档案：按检索项匹配（全文 / 档号 / 题名 / 责任者） */
+    state.found.forEach(function (id) {
       var a = byId(id);
       if (!a) return;
       if (hits.some(function (h) { return h.a.id === id; })) return;
-      var hay = [a.code, a.title, a.author, a.kind, (a.body || '').replace(/<[^>]+>/g, '')].join(' ');
+      var hay;
+      if (field === '档号') { hay = a.code || ''; }
+      else if (field === '题名') { hay = a.title || ''; }
+      else if (field === '责任者') { hay = a.author || ''; }
+      else { hay = [a.code, a.title, a.author, a.kind, (a.body || '').replace(/<[^>]+>/g, '')].join(' '); }
       if (norm(hay).indexOf(n) !== -1) { hits.push({ a: a, fresh: false }); }
     });
 
@@ -790,7 +884,7 @@ footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
   function doSearch(form) {
     var q = form.querySelector('.q').value;
     var field = form.querySelector('.field').value;
-    var hits = search(q);
+    var hits = search(q, field);
 
     show('search');
     var panel = $('#resultPanel');
@@ -1031,6 +1125,184 @@ footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
         '<p class="doc-p">感谢查询。</p>' +
       '</div>';
   }
+
+  /* =======================================================================
+     栏目页 / 公告详情 / 法规详情
+     ======================================================================= */
+  var PAGE_INDEX = {};
+
+  (function buildPageIndex() {
+    (PAGES.nav || []).forEach(function (sec) {
+      (sec.items || []).forEach(function (id) {
+        var p = (PAGES.pages || {})[id];
+        if (!p) { return; }
+        PAGE_INDEX[id] = {
+          kind: 'page', title: p.title, html: p.html,
+          section: sec.name, secKey: sec.key, items: sec.items, self: id
+        };
+      });
+    });
+    /* 不在导航分组里的页面（联系我们、网站地图、帮助、隐私、无障碍声明、登录等）也要能打开 */
+    Object.keys(PAGES.pages || {}).forEach(function (id) {
+      if (PAGE_INDEX[id]) { return; }
+      var p = PAGES.pages[id];
+      PAGE_INDEX[id] = {
+        kind: 'page', title: p.title, html: p.html,
+        section: '辅助栏目', secKey: '', items: null, self: id
+      };
+    });
+
+    (PAGES.notices || []).forEach(function (n) {
+      PAGE_INDEX['notice-' + n.id] = {
+        kind: 'notice', title: n.title, html: n.html, meta: n.no, date: n.date,
+        section: '通知公告', secKey: 'home'
+      };
+    });
+    (PAGES.laws || []).forEach(function (l) {
+      PAGE_INDEX['law-' + l.id] = {
+        kind: 'law', title: l.title, html: l.html, meta: l.meta,
+        section: '政策法规', secKey: 'law'
+      };
+    });
+  })();
+
+  /* 按真实站点结构生成带链接的网站地图 */
+  function buildSiteMapHTML() {
+    var out = '<ul class="plain">';
+    out += '<li><a href="#" data-view="home">首页</a></li>';
+
+    (PAGES.nav || []).forEach(function (sec) {
+      out += '<li>' + esc(sec.name) + '<ul class="plain" style="margin-left:1.2em">';
+      if (sec.key === 'holdings') {
+        out += '<li><a href="#" data-view="search">档案检索</a></li>';
+      }
+      (sec.items || []).forEach(function (id) {
+        var q = (PAGES.pages || {})[id];
+        if (!q) { return; }
+        out += '<li><a href="#" data-page="' + id + '">' + esc(q.title) + '</a></li>';
+      });
+      out += '</ul></li>';
+    });
+
+    var aux = ['site-map', 'help', 'privacy', 'access', 'about-contact', 'login'];
+    out += '<li>辅助栏目<ul class="plain" style="margin-left:1.2em">';
+    aux.forEach(function (id) {
+      var q = (PAGES.pages || {})[id];
+      if (!q) { return; }
+      out += '<li><a href="#" data-page="' + id + '">' + esc(q.title) + '</a></li>';
+    });
+    out += '</ul></li>';
+
+    out += '<li>通知公告<ul class="plain" style="margin-left:1.2em">';
+    (PAGES.notices || []).forEach(function (n) {
+      out += '<li><a href="#" data-page="notice-' + esc(n.id) + '">' + esc(n.title) + '</a></li>';
+    });
+    out += '</ul></li>';
+
+    out += '</ul>';
+    return out;
+  }
+
+  function openPage(id) {
+    var p = PAGE_INDEX[id];
+    if (!p) { return; }
+    show('page', p.title);
+    document.getElementById('crumb').innerHTML =
+      '当前位置：<b>' + esc(p.section) + '</b> &gt; <b>' + esc(p.title) + '</b>';
+
+    /* 顶部导航高亮到对应栏目 */
+    Array.prototype.forEach.call(document.querySelectorAll('#nav a'), function (a) {
+      a.classList.toggle('on', a.getAttribute('data-sec') === p.secKey);
+    });
+
+    /* 左侧栏目导航 */
+    var side = '';
+    if (p.kind === 'page' && p.items && p.items.length > 1) {
+      side = '<div class="side-nav"><div class="h">' + esc(p.section) + '</div><ul>' +
+        p.items.map(function (it) {
+          var q = (PAGES.pages || {})[it];
+          if (!q) { return ''; }
+          return '<li><a href="#" data-page="' + it + '"' + (it === p.self ? ' class="on"' : '') + '>' + esc(q.title) + '</a></li>';
+        }).join('') + '</ul></div>';
+    } else if (p.kind === 'notice') {
+      side = '<div class="side-nav"><div class="h">通知公告</div><ul>' +
+        (PAGES.notices || []).map(function (n) {
+          var nid = 'notice-' + n.id;
+          return '<li><a href="#" data-page="' + nid + '"' + (nid === id ? ' class="on"' : '') + '>' + esc(n.title) + '</a></li>';
+        }).join('') + '</ul></div>';
+    } else if (p.kind === 'law') {
+      side = '<div class="side-nav"><div class="h">政策法规</div><ul>' +
+        (PAGES.laws || []).map(function (l) {
+          var lid = 'law-' + l.id;
+          return '<li><a href="#" data-page="' + lid + '"' + (lid === id ? ' class="on"' : '') + '>' + esc(l.title) + '</a></li>';
+        }).join('') + '</ul></div>';
+    }
+
+    if (id === 'site-map') {
+      p.html = buildSiteMapHTML();
+    }
+
+    var meta = '';
+    if (p.meta || p.date) {
+      meta = '<div class="page-meta">' + (p.meta ? esc(p.meta) : '') + (p.date ? '　' + esc(p.date) : '') + '</div>';
+    }
+
+    document.getElementById('pageWrap').innerHTML =
+      '<div class="page-cols">' + side +
+        '<div class="page-main"><div class="h">' + esc(p.title) + '</div>' +
+        '<div class="b">' + meta + (p.html || '') + '</div></div>' +
+      '</div>';
+  }
+
+  /* =======================================================================
+     字号调节（无障碍）
+     ======================================================================= */
+  var FS_KEY = 'qinba_fs';
+
+  function applyFs(v) {
+    document.body.classList.remove('fs-s', 'fs-m', 'fs-l');
+    document.body.classList.add('fs-' + v);
+    Array.prototype.forEach.call(document.querySelectorAll('[data-fs]'), function (a) {
+      a.classList.toggle('cur', a.getAttribute('data-fs') === v);
+    });
+    try { localStorage.setItem(FS_KEY, v); } catch (e) {}
+  }
+
+  (function initFs() {
+    var v = 'm';
+    try { v = localStorage.getItem(FS_KEY) || 'm'; } catch (e) {}
+    applyFs(v);
+  })();
+
+  /* 栏目链接 / 字号按钮 */
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest('[data-page]');
+    if (a) { ev.preventDefault(); openPage(a.getAttribute('data-page')); return; }
+    var f = ev.target.closest('[data-fs]');
+    if (f) { ev.preventDefault(); applyFs(f.getAttribute('data-fs')); return; }
+  });
+
+  /* 登录表单：只是走个流程，不校验、不发请求 */
+  document.addEventListener('submit', function (ev) {
+    var f = ev.target;
+    if (!f || !f.classList || !f.classList.contains('login-form')) { return; }
+    ev.preventDefault();
+
+    var u = f.querySelector('#loginUser');
+    var p = f.querySelector('#loginPass');
+    var out = document.getElementById('loginMsg');
+    if (!out) {
+      out = document.createElement('p');
+      out.id = 'loginMsg';
+      out.className = 'login-msg';
+      f.parentNode.insertBefore(out, f.nextSibling);
+    }
+    if (!u || !u.value || !p || !p.value) {
+      out.textContent = '请输入用户名和密码。';
+    } else {
+      out.textContent = '用户名或密码不正确。本系统账号由办公室统一分配，如有疑问请与办公室联系（内线 8021）。';
+    }
+  });
 
   /* ---------- 启动 ---------- */
   renderClock();
