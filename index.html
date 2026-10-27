@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1A4B8C">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/images/logo.png">
+<link rel="apple-touch-icon" href="assets/images/logo.png">
+<title>秦巴县档案馆</title>
+<style>
+/* =========================================================================
+   秦巴县档案馆 · 数字档案馆检索平台
+   刻意做成一个普通县级档案馆门户站的样子：白底、蓝头、表格、面包屑、页脚备案。
+   没有光效、没有卡片动画、没有旁白、没有任何“游戏提示”。
+   ========================================================================= */
+
+:root{
+  --blue:#1A4B8C;
+  --blue-d:#123A6E;
+  --link:#1A4B8C;
+  --text:#333;
+  --gray:#666;
+  --gray-l:#999;
+  --line:#d8d8d8;
+  --bg:#fff;
+  --bg-soft:#f7f8fa;
+  --red:#9B1B1B;
+  --font-ui:"Microsoft YaHei","微软雅黑","PingFang SC","Hiragino Sans GB",Arial,sans-serif;
+  --font-doc:"SimSun","宋体","Songti SC",serif;
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+body{
+  background:var(--bg-soft);
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-size:14px;
+  line-height:1.7;
+  -webkit-text-size-adjust:100%;
+}
+a{ color:var(--link); text-decoration:none; }
+a:hover{ text-decoration:underline; }
+img{ border:0; }
+.wrap{ max-width:1100px; margin:0 auto; background:var(--bg); box-shadow:0 0 0 1px var(--line); }
+
+/* ---------------- 页头 ---------------- */
+.site-head{
+  display:flex; align-items:center; gap:14px;
+  padding:18px 24px 14px;
+  border-bottom:3px solid var(--blue);
+}
+.brand{ display:flex; align-items:center; gap:12px; min-width:0; }
+.brand img{ width:52px; height:52px; object-fit:contain; flex:0 0 auto; }
+.brand h1{
+  margin:0; font-family:var(--font-doc); font-size:26px; font-weight:700;
+  letter-spacing:.12em; color:var(--blue-d); line-height:1.25;
+}
+.brand p{ margin:2px 0 0; font-size:12.5px; color:var(--gray); letter-spacing:.18em; }
+.head-right{ margin-left:auto; text-align:right; font-size:12.5px; color:var(--gray); }
+.head-right .clock{ font-family:var(--font-doc); letter-spacing:.04em; }
+.head-right .tools{ margin-top:4px; color:var(--gray-l); }
+.head-right .tools a{ color:var(--gray); }
+
+/* ---------------- 导航 ---------------- */
+.nav{ display:flex; background:var(--blue); }
+.nav a{
+  display:block; padding:11px 26px; color:#fff; font-size:15px;
+  border-right:1px solid rgba(255,255,255,.16);
+}
+.nav a:hover{ background:var(--blue-d); text-decoration:none; }
+.nav a.on{ background:var(--blue-d); }
+
+/* ---------------- 面包屑 ---------------- */
+.crumb{
+  padding:10px 24px; font-size:12.5px; color:var(--gray);
+  border-bottom:1px solid var(--line); background:var(--bg);
+}
+.crumb b{ font-weight:400; color:var(--text); }
+
+/* ---------------- 主体 ---------------- */
+main{ padding:20px 24px 34px; min-height:420px; }
+.panel{ border:1px solid var(--line); margin-bottom:20px; }
+.panel-h{
+  padding:9px 14px; font-size:15px; font-weight:700; color:var(--blue-d);
+  background:#eef3f9; border-bottom:1px solid var(--line);
+}
+.panel-b{ padding:14px 16px; }
+
+/* 首页两栏 */
+.cols{ display:flex; gap:20px; align-items:flex-start; }
+.col-main{ flex:1 1 auto; min-width:0; }
+.col-side{ flex:0 0 300px; }
+@media (max-width:820px){ .cols{ display:block; } .col-side{ margin-top:20px; } }
+
+/* 公告列表 */
+ul.notices{ list-style:none; margin:0; padding:0; }
+ul.notices li{
+  padding:8px 0 8px 14px; border-bottom:1px dashed var(--line); position:relative;
+  font-size:13.5px;
+}
+ul.notices li:last-child{ border-bottom:0; }
+ul.notices li::before{ content:"·"; position:absolute; left:2px; color:var(--gray-l); }
+ul.notices .date{ color:var(--gray-l); font-size:12.5px; margin-left:8px; }
+ul.notices li.odd{ color:var(--red); }
+
+/* 简介文字 */
+.intro{ font-family:var(--font-doc); font-size:15px; line-height:2; text-indent:2em; margin:0 0 10px; }
+
+/* 检索表单 */
+.searchbar{
+  display:flex; gap:0; align-items:stretch; max-width:720px;
+  border:1px solid #b9c4d2; background:#fff;
+}
+.searchbar select{
+  border:0; border-right:1px solid var(--line); background:#f2f5f9; color:var(--text);
+  font-family:var(--font-ui); font-size:13.5px; padding:0 8px; outline:none;
+}
+.searchbar input{
+  flex:1 1 auto; min-width:0; border:0; outline:none; padding:10px 12px;
+  font-family:var(--font-doc); font-size:15px; color:var(--text); background:#fff;
+}
+.searchbar button{
+  border:0; background:var(--blue); color:#fff; font-family:var(--font-ui);
+  font-size:14px; letter-spacing:.1em; padding:0 22px; cursor:pointer;
+}
+.searchbar button:hover{ background:var(--blue-d); }
+.search-tip{ margin-top:8px; font-size:12.5px; color:var(--gray-l); }
+
+/* 结果表格 */
+.tbl{ width:100%; border-collapse:collapse; font-size:13.5px; }
+.tbl th,.tbl td{ border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+.tbl th{ background:#eef3f9; color:#20456f; font-weight:400; white-space:nowrap; }
+.tbl tr:hover td{ background:#fafbfd; }
+.tbl td.c{ text-align:center; white-space:nowrap; }
+.tbl td.num{ width:44px; text-align:center; color:var(--gray); }
+.tbl .state-wait{ color:var(--red); }
+.tbl .state-ok{ color:#2c6b2c; }
+.empty{ padding:26px 0; text-align:center; color:var(--gray); font-size:13.5px; }
+
+/* ---------------- 档案详情 ---------------- */
+.doc-head{ text-align:center; padding:6px 0 14px; border-bottom:1px solid var(--line); margin-bottom:14px; }
+.doc-head h2{
+  margin:0 0 6px; font-family:var(--font-doc); font-size:22px; font-weight:700;
+  letter-spacing:.06em; color:#222;
+}
+.doc-head .sub{ font-size:12.5px; color:var(--gray); letter-spacing:.1em; }
+.meta{ width:100%; border-collapse:collapse; font-size:13px; margin-bottom:18px; }
+.meta th,.meta td{ border:1px solid var(--line); padding:6px 10px; text-align:left; }
+.meta th{ background:#f7f8fa; color:var(--gray); font-weight:400; width:88px; white-space:nowrap; }
+
+/* 档案正文：宋体、公文版式 */
+.doc-body{
+  font-family:var(--font-doc); font-size:16px; line-height:2; color:#222;
+  max-width:760px;
+}
+.doc-p{ margin:.6em 0; text-indent:2em; }
+.doc-title{ margin:1.2em 0 .4em; font-weight:700; letter-spacing:.05em; }
+.doc-kvlist{ margin:.9em 0; }
+.doc-kv{ display:flex; border-bottom:1px dotted #cfcfcf; padding:5px 0; }
+.doc-kv .k{ flex:0 0 7.5em; color:#555; }
+.doc-kv .v{ flex:1 1 auto; min-width:0; word-break:break-word; }
+.doc-table{ width:100%; border-collapse:collapse; margin:.9em 0; font-size:15px; }
+.doc-table th,.doc-table td{ border:1px solid #b5b5b5; padding:5px 9px; text-align:left; }
+.doc-table th{ background:#f3f3f3; font-weight:400; }
+.doc-quote{
+  margin:.9em 0; padding:.5em .9em; border-left:2px solid #999; background:#fafafa;
+  font-family:var(--font-doc); font-size:15.5px;
+}
+.doc-note{ margin:.8em 0; font-size:13px; color:#666; font-family:var(--font-ui); line-height:1.85; }
+.doc-sign{ margin:.9em 0 0; text-align:right; }
+.stamp{
+  display:inline-block; margin:.4em .3em; padding:.15em .45em;
+  border:1.5px solid var(--red); color:var(--red); font-family:var(--font-doc);
+  font-size:14px; letter-spacing:.12em; transform:rotate(-4deg); opacity:.85;
+}
+.pencil{ color:#8a8a8a; font-size:.94em; }
+.redword{ color:#a32020; }
+.crossed{ text-decoration:line-through; color:#777; }
+.faint{ color:#9a9a9a; font-size:.92em; }
+.ghost{ background:#2b2b2b; color:#6d6d6d; padding:0 .25em; letter-spacing:.12em; }
+
+/* 附件 */
+.attach{ margin-top:22px; border-top:1px solid var(--line); padding-top:14px; }
+.attach-h{ font-size:13.5px; color:var(--gray); margin-bottom:8px; }
+.attach img{
+  display:block; max-width:520px; width:100%; height:auto;
+  border:1px solid #b5b5b5; background:#f2f2f2;
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:manipulation;
+}
+.scan-err{ margin-top:6px; font-size:12.5px; color:var(--red); }
+.scan-err a{ color:var(--red); }
+.scan-ok{ color:#2c6b2c; }
+details.attach > summary{
+  cursor:pointer; font-size:13.5px; color:var(--link); outline:none;
+  margin-bottom:8px;
+}
+
+/* 补录 / 凭证 */
+.signbox{ margin-top:20px; border:1px solid var(--line); padding:14px 16px; max-width:520px; font-family:var(--font-ui); }
+.signbox .h{ font-size:14px; color:#20456f; margin-bottom:10px; }
+.signbox label{ display:block; font-size:13.5px; color:var(--gray); margin-bottom:10px; }
+.signbox input{
+  width:100%; margin-top:5px; padding:8px 10px; border:1px solid #b9c4d2;
+  font-family:var(--font-doc); font-size:15px; outline:none;
+}
+.signbox button{
+  background:var(--blue); color:#fff; border:0; padding:8px 22px; font-size:14px;
+  font-family:var(--font-ui); cursor:pointer;
+}
+.signbox button:hover{ background:var(--blue-d); }
+
+.cert{
+  position:relative; margin-top:18px; padding:22px 20px 46px; max-width:560px;
+  border:1px solid #c9a0a0; background:#fffdf8;
+  font-family:var(--font-doc); font-size:15px; line-height:2;
+}
+.cert h3{ margin:0 0 12px; text-align:center; font-size:19px; letter-spacing:.3em; color:var(--red); }
+.cert .no{ font-size:12.5px; color:var(--gray); text-align:right; }
+.cert p{ text-indent:2em; margin:.5em 0; }
+.cert .remark{ font-size:13px; color:#555; border-top:1px dotted #ccc; padding-top:8px; margin-top:12px; text-indent:0; }
+.cert .foot{ text-align:right; font-size:12.5px; color:var(--gray); margin-top:14px; }
+.cert img.seal{ position:absolute; right:10px; bottom:44px; width:96px; opacity:.72; mix-blend-mode:multiply; }
+.print-btn{ margin-top:10px; background:#fff; border:1px solid #b9c4d2; color:var(--text); padding:6px 16px; font-size:13px; cursor:pointer; }
+
+/* ---------------- 页脚 ---------------- */
+footer{
+  border-top:1px solid var(--line); background:#f4f6f9;
+  padding:16px 24px 22px; font-size:12.5px; color:var(--gray); line-height:1.9;
+}
+footer .row{ display:flex; flex-wrap:wrap; gap:6px 18px; }
+footer .disc{ margin-top:8px; color:#9a9a9a; font-size:12px; }
+
+/* 打印凭证 */
+@media print{
+  .site-head,.nav,.crumb,footer,.searchbar,.attach,.signbox,.print-btn,.no-print{ display:none !important; }
+  .wrap{ box-shadow:none; max-width:none; }
+  main{ padding:0; }
+  .cert{ border:1px solid #999; page-break-inside:avoid; }
+}
+
+/* 手机 */
+@media (max-width:640px){
+  .site-head{ padding:14px 14px 12px; gap:10px; }
+  .brand img{ width:40px; height:40px; }
+  .brand h1{ font-size:20px; letter-spacing:.08em; }
+  .brand p{ font-size:11px; letter-spacing:.08em; }
+  .head-right{ font-size:11px; }
+  .nav{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .nav a{ padding:10px 15px; font-size:14px; white-space:nowrap; }
+  .crumb{ padding:8px 14px; font-size:12px; }
+  main{ padding:14px 14px 26px; }
+  .searchbar{ max-width:none; }
+  .searchbar button{ padding:0 14px; font-size:13.5px; }
+  .doc-body{ font-size:15.5px; }
+  .doc-head h2{ font-size:19px; }
+  .tbl{ font-size:12.5px; }
+  .tbl th,.tbl td{ padding:6px 6px; }
+  .tbl .hide-sm{ display:none; }
+  footer{ padding:14px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ======================= 页头 ======================= -->
+  <header class="site-head">
+    <div class="brand">
+      <img src="assets/images/logo.png" alt="秦巴县档案馆">
+      <div>
+        <h1>秦巴县档案馆</h1>
+        <p>数字档案馆检索平台</p>
+      </div>
+    </div>
+    <div class="head-right">
+      <div class="clock" id="sysClock">系统时间：1980-08-04 06:00</div>
+      <div class="tools"><a href="#" onclick="return false">无障碍浏览</a> | <a href="#" onclick="return false">繁体</a> | <a href="#" onclick="return false">登录</a></div>
+    </div>
+  </header>
+
+  <!-- ======================= 导航 ======================= -->
+  <nav class="nav" id="nav">
+    <a href="#" data-view="home">首页</a>
+    <a href="#" data-view="about">本馆概况</a>
+    <a href="#" data-view="search">馆藏检索</a>
+    <a href="#" data-view="service">利用服务</a>
+    <a href="#" data-view="law">政策法规</a>
+  </nav>
+
+  <div class="crumb" id="crumb">当前位置：<b>首页</b></div>
+
+  <!-- ======================= 主体 ======================= -->
+  <main>
+
+    <!-- ---------- 首页 ---------- -->
+    <section class="view" id="view-home">
+      <div class="cols">
+        <div class="col-main">
+          <div class="panel">
+            <div class="panel-h">档案馆简介</div>
+            <div class="panel-b">
+              <p class="intro" id="homeIntro"></p>
+              <p><a href="#" data-view="about">[ 详细 ]</a></p>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-h">馆藏检索</div>
+            <div class="panel-b">
+              <form class="searchbar" id="homeSearchForm" autocomplete="off">
+                <select name="field" class="field">
+                  <option value="全文">全文</option>
+                  <option value="档号">档号</option>
+                  <option value="题名">题名</option>
+                  <option value="责任者">责任者</option>
+                </select>
+                <input type="text" name="q" class="q" placeholder="请输入档号、题名、责任者或关键词">
+                <button type="submit">检　索</button>
+              </form>
+              <div class="search-tip">说明：本平台已开放 1980 年以前文书档案目录检索，涉密及未解密档案不提供在线查阅。</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-side">
+          <div class="panel">
+            <div class="panel-h">通知公告</div>
+            <div class="panel-b">
+              <ul class="notices" id="noticeList"></ul>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-h">查阅时间</div>
+            <div class="panel-b" style="font-size:13px;color:#555;line-height:2;">
+              周一至周五（法定节假日除外）<br>
+              上午 08:30 — 11:30<br>
+              下午 14:30 — 17:30<br>
+              查阅地点：本馆二楼查阅室
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- 本馆概况 ---------- -->
+    <section class="view" id="view-about" hidden>
+      <div class="panel">
+        <div class="panel-h">本馆概况</div>
+        <div class="panel-b">
+          <p class="intro" id="aboutIntro"></p>
+          <table class="meta" style="max-width:640px;margin-top:16px;">
+            <tr><th>馆名</th><td>秦巴县档案馆</td><th>建馆时间</th><td>1958 年</td></tr>
+            <tr><th>馆藏总量</th><td>3.2 万卷（件）</td><th>起止年代</th><td>1935 — 1980</td></tr>
+            <tr><th>开放时间</th><td>周一至周五</td><th>查阅方式</th><td>到馆查阅 / 在线目录检索</td></tr>
+          </table>
+          <p class="intro" style="margin-top:14px;">本馆数字化工作于 2026 年 3 月启动，目前已完成 1980 年以前文书档案的目录著录与部分全文扫描。因设备与经费限制，扫描件质量参差，如有缺损请与查阅室联系。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- 馆藏检索 ---------- -->
+    <section class="view" id="view-search" hidden>
+      <div class="panel">
+        <div class="panel-h">馆藏档案检索</div>
+        <div class="panel-b">
+          <form class="searchbar" id="mainSearchForm" autocomplete="off">
+            <select name="field" class="field">
+              <option value="全文">全文</option>
+              <option value="档号">档号</option>
+              <option value="题名">题名</option>
+              <option value="责任者">责任者</option>
+            </select>
+            <input type="text" name="q" class="q" placeholder="请输入档号、题名、责任者或关键词">
+            <button type="submit">检　索</button>
+          </form>
+          <div class="search-tip" id="searchTip">可检索项：全文、档号、题名、责任者。</div>
+        </div>
+      </div>
+
+      <div class="panel" id="resultPanel" hidden>
+        <div class="panel-h" id="resultHead">检索结果</div>
+        <div class="panel-b" id="resultBody"></div>
+      </div>
+    </section>
+
+    <!-- ---------- 利用服务 / 政策法规 ---------- -->
+    <section class="view" id="view-service" hidden>
+      <div class="panel">
+        <div class="panel-h">利用服务</div>
+        <div class="panel-b">
+          <p class="intro">一、查阅档案须持本人身份证或单位介绍信，填写《档案查阅登记表》。</p>
+          <p class="intro">二、查阅未开放档案，须经档案形成单位同意，并报本馆负责人批准。</p>
+          <p class="intro">三、档案原件原则上不提供外借，可提供复制件；复制件加盖本馆证明章后与原件具有同等效力。</p>
+          <p class="intro">四、利用者应爱护档案，不得涂改、勾画、折叠、拆卷。</p>
+          <p style="color:#888;font-size:13px;margin-top:16px;">（本栏目内容 1980 年 6 月更新）</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-law" hidden>
+      <div class="panel">
+        <div class="panel-h">政策法规</div>
+        <div class="panel-b">
+          <ul class="notices">
+            <li>《中华人民共和国档案法》（1987 年 9 月 5 日通过）<span class="date">—</span></li>
+            <li>《机关档案工作条例》<span class="date">—</span></li>
+            <li>《档案馆工作通则》<span class="date">—</span></li>
+          </ul>
+          <p style="color:#888;font-size:13px;margin-top:14px;">本栏目内容尚未完成数字化，暂仅提供目录。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- 档案详情 ---------- -->
+    <section class="view" id="view-doc" hidden>
+      <div id="docWrap"></div>
+      <p class="no-print" style="margin-top:22px;"><a href="#" data-view="search">← 返回检索结果</a></p>
+    </section>
+
+  </main>
+
+  <!-- ======================= 页脚 ======================= -->
+  <footer>
+    <div class="row">
+      <span>主办单位：秦巴县档案馆</span>
+      <span>地址：秦巴县城关镇人民路 17 号</span>
+      <span>查阅室电话：0915-XXXXXXX</span>
+    </div>
+    <div class="row">
+      <span>建议使用 1024×768 以上分辨率浏览</span>
+      <span>本平台由县档案馆技术室维护</span>
+    </div>
+    <div class="disc" id="footerNote"></div>
+  </footer>
+</div>
+
+<script>
+/* =========================================================================
+   秦巴县档案馆 · 数字档案馆检索平台 —— 前端逻辑
+   设计原则（按用户要求重做）：
+     1. 界面 = 一个普通的县级档案馆门户站，不做任何游戏化包装
+     2. 全站没有任何“提示下一关”的文案，线索只在档案正文里
+     3. 所有异常都藏在档案内容与系统状态里，不靠特效
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  /* ---------- 数据（构建时注入） ---------- */
+  var ARCHIVES = [
+    {
+      "id": 1,
+      "code": "781-01",
+      "title": "781号档案·卷宗目录",
+      "kind": "目录",
+      "author": "陈望",
+      "date": "1980-08-04",
+      "period": "永久",
+      "status": "已解密",
+      "body": "<div class=\"doc-title\">秦巴县档案馆 · 卷宗目录</div><div class=\"doc-kvlist\"><div class=\"doc-kv\"><span class=\"k\">档号</span><span class=\"v\">781</span></div><div class=\"doc-kv\"><span class=\"k\">索引号</span><span class=\"v\">P44-08</span></div><div class=\"doc-kv\"><span class=\"k\">责任者</span><span class=\"v\">陈望</span></div><div class=\"doc-kv\"><span class=\"k\">立卷单位</span><span class=\"v\">秦巴县广播站</span></div><div class=\"doc-kv\"><span class=\"k\">起止日期</span><span class=\"v\">1980-07-30 至 1998-05-20</span></div><div class=\"doc-kv\"><span class=\"k\">卷内件数</span><span class=\"v\">十二件</span></div></div><div class=\"doc-title\">一、卷内文件目录</div><table class=\"doc-table\"><thead><tr><th>序号</th><th>文件题名</th><th>责任者</th><th>页数</th><th>状态</th></tr></thead><tbody><tr><td>1</td><td>781号档案·卷宗目录</td><td>陈望</td><td>1</td><td>已解密</td></tr><tr><td>2</td><td>人物索引卡</td><td>秦巴县档案馆</td><td>1</td><td>已解密</td></tr><tr><td>3</td><td>后山水文观测站值班日志</td><td>陈望</td><td>2</td><td>已解密</td></tr><tr><td>4</td><td>图书借阅记录</td><td>秦巴县图书馆</td><td>1</td><td>已解密</td></tr><tr><td>5</td><td>第183页信纸扫描件</td><td>陈望</td><td>1</td><td>已解密</td></tr><tr><td>6</td><td>县水利局收文簿（1980年8月）</td><td>秦巴县水利局</td><td>3</td><td>待解密</td></tr><tr><td>7</td><td>安康地区防汛简报（1983年8月）</td><td>安康地区防汛指挥部</td><td>2</td><td>待解密</td></tr><tr><td>8</td><td>白河水文站汛期观测记录（抄件）</td><td>白河水文站</td><td>2</td><td>待解密</td></tr><tr><td>9</td><td>后山水文观测站设备检修单</td><td>秦巴县广播站</td><td>1</td><td>待解密</td></tr><tr><td>10</td><td>上游三村搬迁登记表（1998年）</td><td>秦巴县民政局</td><td>4</td><td>待解密</td></tr><tr><td>11</td><td>陈望人事档案摘录</td><td>秦巴县广播站</td><td>2</td><td>待解密</td></tr><tr><td>12</td><td>归档确认页</td><td>秦巴县档案馆</td><td>1</td><td>待解密</td></tr></tbody></table><p class=\"doc-p\">本卷为陈望1980年汛期形成的水文观测材料及本馆后续补充的查证文件。第一件至第五件为原件或影印件，第六件起系历次收集，待核准后开放。卷内文件阅后请归还原位，不得抽取、折角。</p>"
+    },
+    {
+      "id": 2,
+      "code": "人-0371",
+      "title": "人物索引卡",
+      "kind": "卡片",
+      "author": "秦巴县档案馆",
+      "date": "1980-08-04",
+      "period": "长期",
+      "status": "已解密",
+      "body": "<div class=\"doc-title\">秦巴县档案馆 · 人物索引</div><div class=\"doc-kvlist\"><div class=\"doc-kv\"><span class=\"k\">姓名</span><span class=\"v\">陈望</span></div><div class=\"doc-kv\"><span class=\"k\">性别</span><span class=\"v\">男</span></div><div class=\"doc-kv\"><span class=\"k\">职业</span><span class=\"v\">县广播站技术员（1976—1980）</span></div><div class=\"doc-kv\"><span class=\"k\">工作单位</span><span class=\"v\">秦巴县广播站（1976—1980）</span></div><div class=\"doc-kv\"><span class=\"k\">驻点</span><span class=\"v\">后山水文观测站（1979.3—1980.8）</span></div><div class=\"doc-kv\"><span class=\"k\">籍贯</span><span class=\"v\">秦巴县</span></div><div class=\"doc-kv\"><span class=\"k\">最后一次登记</span><span class=\"v\">1980年8月4日</span></div><div class=\"doc-kv\"><span class=\"k\">状态</span><span class=\"v\"><span class=\"redword\">失踪，档案未结</span></span></div><div class=\"doc-kv\"><span class=\"k\">备注</span><span class=\"v\">其名下编号781档案处于待归档状态</span></div></div><p class=\"doc-p\"><span class=\"pencil\">查无此人</span></p><p class=\"doc-p\">登记依据：秦巴县广播站1980年8月人员名册、后山水文观测站代班记录、公社报案登记。该员于1980年8月4日傍晚外出未归，当日本县山洪突发，渡口一带水势湍急，沿江搜救三日无果。卡面照片模糊，各栏为打字机填写，红章压于状态栏。</p><div class=\"doc-note\">本卡经二次核校，索引项与卷内材料一致。关联卷宗：档号781。附注：秦巴县为旧名，其地今属紫阳县辖。</div><div class=\"doc-sign\">登记单位：秦巴县档案馆　一九八〇年八月</div>"
+    },
+    {
+      "id": 3,
+      "code": "水文-1980-07",
+      "title": "后山水文观测站值班日志",
+      "kind": "日志",
+      "author": "后山水文观测站",
+      "date": "1980-07-30",
+      "period": "长期",
+      "status": "已解密",
+      "body": "<div class=\"doc-title\">后山水文观测站 · 值班日志</div><table class=\"doc-table\"><thead><tr><th>项目</th><th>记录</th></tr></thead><tbody><tr><td>日期</td><td>7月30日</td></tr><tr><td>天气</td><td>晴转多云</td></tr><tr><td>水位</td><td>2.1 m</td></tr><tr><td>警戒线</td><td>1.7 m</td></tr><tr><td>超出</td><td>0.4 m</td></tr><tr><td>观测人</td><td>陈望（代班）</td></tr><tr><td>日期</td><td>■■■■<span class=\"ghost\">2026</span>■■■■</td></tr></tbody></table><p class=\"doc-p\">本站设备为1974年架设的直立水尺与自记水位计，浮筒锈蚀，读数须人工复校。当日实测水位高出警戒线0.4米，上游来水持续，河面漂浮树枝杂草。本站已连续三日报县水利局防汛办，未获答复。观测断面设于后山南坡，下游三公里为洞河镇渡口，汛期摆渡照常。</p><blockquote class=\"doc-quote\">数据异常，拟上报。报告誊抄两份：一份在日志内，一份夹于《基础气象观测》第183页，书托钟叔保管。——陈望</blockquote><div class=\"doc-note\">日志第2页背面存蓝色复写纸压痕，可辨认部分数字。纸页受潮，边缘发霉。</div><div class=\"doc-sign\">后山水文观测站　一九八〇年七月三十日</div>"
+    },
+    {
+      "id": 4,
+      "code": "图书-1980-071",
+      "title": "图书借阅记录",
+      "kind": "登记簿",
+      "author": "秦巴县图书馆",
+      "date": "1980-08-04",
+      "period": "短期",
+      "status": "已解密",
+      "body": "<div class=\"doc-title\">秦巴县图书馆 · 图书借阅登记簿（摘录）</div><table class=\"doc-table\"><thead><tr><th>项目</th><th>记录</th></tr></thead><tbody><tr><td>书名</td><td>《基础气象观测》</td></tr><tr><td>版本</td><td>1980年第三次印刷</td></tr><tr><td>索书号</td><td>P44-08</td></tr><tr><td>借阅人</td><td>陈望</td></tr><tr><td>借出日期</td><td>1980-07-25</td></tr><tr><td>应还日期</td><td>1980-08-04</td></tr><tr><td>状态</td><td>未归还　<span class=\"faint\">或：从未借出</span></td></tr><tr><td>馆藏注</td><td>该书已流失馆外，下落不明</td></tr></tbody></table><p class=\"doc-p\">登记簿为硬壳线装，编号连续，本行位于第41页，字迹为蓝黑钢笔。同页其余借阅记录均已按期销账，仅此一行未销。借书人于借出当日下午曾到馆询问气象观测手册，未及闭馆即离开。该书系本馆1974年入藏，属自然科学类常用书，历次借阅均按时归还。</p><div class=\"doc-note\">数字化处理：共扫描 214 页，其中第 183 页扫描件损坏，仅存局部，见附件。</div><div class=\"doc-sign\">秦巴县图书馆　一九八〇年八月</div>"
+    },
+    {
+      "id": 5,
+      "code": "781-03",
+      "title": "第183页信纸扫描件",
+      "kind": "信件",
+      "author": "陈望",
+      "date": "1980-08-04",
+      "period": "永久",
+      "status": "已解密",
+      "body": "<div class=\"doc-title\">第183页信纸扫描件（据原件影印，仅存局部）</div><p class=\"doc-p\">县水利局防汛办：</p><p class=\"doc-p\">本人陈望，系县广播站技术员。现报告后山水文观测站设备老化、水位数据异常一事，详情见所附抄录。望尽快核实，汛期将至，上游三村百余户人家。</p><p class=\"doc-p\">另：此书若未能及时归还，烦请转交供销社钟叔。</p><p class=\"doc-p\">P44-08（781），可查档。</p><p class=\"doc-p\">1980年8月4日</p><p class=\"doc-p\"><span class=\"redword\">山洪　渡口　封存</span></p><p class=\"doc-p\"><span class=\"pencil\">这条江有多长，档案就该有多长。</span></p><p class=\"doc-p\"><span class=\"pencil\">如果有一天你搜到这里，说明你也不确定了</span></p><p class=\"doc-p\">信纸背面另有铅笔小字四枚，辨为「汉江 上游」，笔迹与正文不同，来源待考。纸面折痕三处，其一恰压于末行红笔字上。</p><div class=\"doc-note\">影印说明：原件与书页装订线相连，扫描时未拆页。据县水利局收文簿记载，此信未登记入册。</div>"
+    },
+    {
+      "id": 6,
+      "code": "781-04",
+      "title": "县水利局收文簿（1980年8月）",
+      "kind": "登记簿",
+      "author": "秦巴县水利局",
+      "date": "1980-08-31",
+      "period": "永久",
+      "status": "已解密",
+      "body": "<div class=\"doc-title\">秦巴县水利局 · 收文簿（1980年8月）</div><table class=\"doc-table\"><thead><tr><th>收文号</th><th>日期</th><th>来文单位</th><th>事由</th><th>处理意见</th></tr></thead><tbody><tr><td>水收81</td><td>8月2日</td><td>蒿坪公社</td><td>渠道岁修请示</td><td>转工程股</td></tr><tr><td>水收84</td><td>8月4日</td><td>县气象站</td><td>八月上旬天气趋势</td><td>存查</td></tr><tr><td>水收87</td><td>8月5日</td><td>县广播站 陈望 寄</td><td>汛期水文隐患报告（781）一份</td><td>未登记入册，存查</td></tr><tr><td>水收92</td><td>8月11日</td><td>地区水利局</td><td>汛期值班安排</td><td>传阅</td></tr><tr><td>水收96</td><td>8月18日</td><td>后山公社</td><td>渡口停渡报告</td><td>转防汛办</td></tr><tr><td>水收101</td><td>8月27日</td><td>县供销社</td><td>仓库防潮情况</td><td>存查</td></tr></tbody></table><p class=\"doc-p\">本月共收文一百零四件，其中防汛类十一件，均已分送。本簿由收发室逐日登记，处理意见栏由承办人签注。第87号一件未见正文归档，收发室回忆，来件为信封一件，封口完好，当日即转防汛办，此后无回执。</p><div class=\"doc-note\">馆员批注（铅笔，年代不详）：<span class=\"pencil\">此件所报，三年后的七月三十一日一一应验。当日汉江安康段洪峰几何，本馆无档。</span></div><div class=\"doc-sign\">秦巴县水利局收发室　一九八〇年八月三十一日</div>"
+    },
+    {
+      "id": 7,
+      "code": "781-05",
+      "title": "安康地区防汛简报（1983年8月）",
+      "kind": "简报",
+      "author": "安康地区防汛指挥部",
+      "date": "1983-08-05",
+      "period": "永久",
+      "status": "已解密",
+      "body": "<div class=\"doc-title\">安康地区防汛指挥部 · 防汛简报（第七期）</div><div class=\"doc-kvlist\"><div class=\"doc-kv\"><span class=\"k\">期号</span><span class=\"v\">第七期</span></div><div class=\"doc-kv\"><span class=\"k\">编印日期</span><span class=\"v\">1983年8月5日</span></div><div class=\"doc-kv\"><span class=\"k\">发送范围</span><span class=\"v\">地直各单位、沿江县（区）</span></div></div><p class=\"doc-p\">七月下旬以来，汉江上游连降暴雨，江水陡涨。七月三十一日，洪峰通过安康城区，实测洪峰流量三万一千立方米每秒（31000 m³/s），相应水位高程259.23米，为本世纪以来所仅见，水势之大，为二百年一遇。</p><p class=\"doc-p\">洪水漫过城堤，安康城区大部被淹，交通、供电、通讯一度中断，沿江安康、紫阳、白河等县均受灾。据初步统计，全区因灾遇难870人，受灾8.96万人，直接经济损失4.13亿元。灾后清淤、防疫、复电及灾民安置工作已全面展开。</p><p class=\"doc-p\">水情记载：上游白河水文站自设站以来，以此为最大洪峰，设站年份见该站站志。</p><div class=\"doc-sign\">安康地区防汛指挥部　一九八三年八月五日</div>"
+    },
+    {
+      "id": 8,
+      "code": "水文-1983-07",
+      "title": "白河水文站汛期观测记录（抄件）",
+      "kind": "记录",
+      "author": "白河水文站",
+      "date": "1983-07-31",
+      "period": "长期",
+      "status": "已解密",
+      "body": "<div class=\"doc-title\">白河水文站 · 汛期观测记录（抄件）</div><div class=\"doc-kvlist\"><div class=\"doc-kv\"><span class=\"k\">站名</span><span class=\"v\">白河水文站</span></div><div class=\"doc-kv\"><span class=\"k\">站址</span><span class=\"v\">陕西省白河县（东经110°07′，北纬32°49′）</span></div><div class=\"doc-kv\"><span class=\"k\">观测日期</span><span class=\"v\">1983年7月31日</span></div><div class=\"doc-kv\"><span class=\"k\">洪峰流量</span><span class=\"v\">31000 m³/s（地区防汛指挥部核定）</span></div><div class=\"doc-kv\"><span class=\"k\">洪峰水位</span><span class=\"v\">水尺漫顶，实测中断，高程待核</span></div><div class=\"doc-kv\"><span class=\"k\">集水面积</span><span class=\"v\">待核</span></div><div class=\"doc-kv\"><span class=\"k\">测站性质</span><span class=\"v\">汉江中游控制站</span></div></div><p class=\"doc-p\">当日暴雨自上游来，本站水位自凌晨起持续上涨，八时报汛时已越保证水位，午后水尺漫顶，观测中断，流量据断面比降推算，报地区防汛指挥部核定。汛期每日八时、二十时报汛，遇涨水加报，本站职工昼夜值守，测报未断。</p><div class=\"doc-note\">本件抄自白河水文站站志，原件藏长江委水文局汉江局。本站设站于民国二十三年十二月，为汉江中游控制站。</div>"
+    },
+    {
+      "id": 9,
+      "code": "781-06",
+      "title": "后山水文观测站设备检修单",
+      "kind": "单据",
+      "author": "秦巴县广播站",
+      "date": "1979-10-16",
+      "period": "短期",
+      "status": "已解密",
+      "body": "<div class=\"doc-title\">后山水文观测站 · 设备检修单</div><div class=\"doc-kvlist\"><div class=\"doc-kv\"><span class=\"k\">单据号</span><span class=\"v\">后站-1979-04</span></div><div class=\"doc-kv\"><span class=\"k\">检修日期</span><span class=\"v\">1979年10月16日</span></div><div class=\"doc-kv\"><span class=\"k\">设备名称</span><span class=\"v\">自记水位计、雨量筒</span></div><div class=\"doc-kv\"><span class=\"k\">状况</span><span class=\"v\">浮筒锈蚀、时钟停摆、筒口变形</span></div><div class=\"doc-kv\"><span class=\"k\">检修人</span><span class=\"v\">陈望</span></div><div class=\"doc-kv\"><span class=\"k\">处理意见</span><span class=\"v\">申请更换，未获批复，暂以人工观测替代</span></div></div><p class=\"doc-p\">本站设备1974年架设，至本年已逾五年，备件无着。检修当日试测三次，水位读数误差逾十厘米，雨量筒口变形致承雨面积不准，均已如实填报。所报更换申请经县广播站转报上级，未获批复，本站仍按每日八时、二十时人工观测，遇涨水加报。</p><div class=\"doc-note\">备注：取水样点设于洞河镇以北三公里，三水交汇处上游。三水者，汉江、洞河，及另一水，本县旧志失载，待核。</div><div class=\"doc-sign\">检修人：陈望　一九七九年十月十六日</div>"
+    },
+    {
+      "id": 10,
+      "code": "781-07",
+      "title": "上游三村搬迁登记表（1998年）",
+      "kind": "登记表",
+      "author": "秦巴县民政局",
+      "date": "1998-05-20",
+      "period": "永久",
+      "status": "已解密",
+      "body": "<div class=\"doc-title\">秦巴县民政局 · 上游三村搬迁登记表</div><div class=\"doc-kvlist\"><div class=\"doc-kv\"><span class=\"k\">填报单位</span><span class=\"v\">秦巴县民政局</span></div><div class=\"doc-kv\"><span class=\"k\">填报日期</span><span class=\"v\">1998年5月20日</span></div><div class=\"doc-kv\"><span class=\"k\">涉及村</span><span class=\"v\">后山村、柳树坪、瓦房沟</span></div><div class=\"doc-kv\"><span class=\"k\">户数</span><span class=\"v\">137户</span></div><div class=\"doc-kv\"><span class=\"k\">人口</span><span class=\"v\">486人</span></div><div class=\"doc-kv\"><span class=\"k\">安置去向</span><span class=\"v\">洞河镇安置点</span></div></div><p class=\"doc-p\">三村位于汉江干流后山段北岸，地势低缓，旧以渡口与集镇往来。因汉江干流梯级电站蓄水，水位抬升，三村整体搬迁，自1997年冬开始动员，1998年5月完成。房屋拆除、土地补偿、林木清点均登记在册，逐户签字，补偿清册六册随表附卷。三村整体搬迁，无人员伤亡。原址现为库区水面，旧渡口没入水下，后山水文观测站断面不再复设。</p><div class=\"doc-sign\">秦巴县民政局　一九九八年五月二十日</div><div class=\"stamp\">秦巴县民政局 移民安置专用章</div>"
+    },
+    {
+      "id": 11,
+      "code": "781-08",
+      "title": "陈望人事档案摘录",
+      "kind": "摘录",
+      "author": "秦巴县广播站",
+      "date": "1980-08-10",
+      "period": "长期",
+      "status": "已解密",
+      "body": "<div class=\"doc-title\">秦巴县广播站 · 人事档案摘录</div><div class=\"doc-kvlist\"><div class=\"doc-kv\"><span class=\"k\">姓名</span><span class=\"v\">陈望</span></div><div class=\"doc-kv\"><span class=\"k\">性别</span><span class=\"v\">男</span></div><div class=\"doc-kv\"><span class=\"k\">出生年月</span><span class=\"v\">1954年3月</span></div><div class=\"doc-kv\"><span class=\"k\">参加工作时间</span><span class=\"v\">1976年</span></div><div class=\"doc-kv\"><span class=\"k\">职务</span><span class=\"v\">县广播站技术员</span></div><div class=\"doc-kv\"><span class=\"k\">派驻</span><span class=\"v\">1979年3月派驻后山水文观测站</span></div><div class=\"doc-kv\"><span class=\"k\">结论</span><span class=\"v\">1980年8月10日按失踪处理，予以除名</span></div></div><p class=\"doc-p\">陈望，男，1954年3月生，本县后山公社人。1976年参加工作，任县广播站技术员，负责线路维护与广播机务。1979年3月派驻后山水文观测站，兼办水位、雨量观测与报汛。1980年8月4日外出未归，当日本县山洪突发，沿江搜救三日无果，1980年8月10日按失踪处理，予以除名。其名下物品由广播站封存，无亲属认领。</p><div class=\"doc-note\">附注（后补）：本卷所载水势，以一九八三年七月三十一日安康城区段水位高程为准，其余记载不采。</div><div class=\"doc-sign\">秦巴县广播站　一九八〇年八月十日</div>"
+    },
+    {
+      "id": 12,
+      "code": "781-09",
+      "title": "归档确认页",
+      "kind": "确认页",
+      "author": "秦巴县档案馆",
+      "date": "1980-08-05",
+      "period": "永久",
+      "status": "已解密",
+      "final": true,
+      "body": "<div class=\"doc-title\">781号档案 · 归档成功</div><div class=\"doc-kvlist\"><div class=\"doc-kv\"><span class=\"k\">档案名称</span><span class=\"v\">1980年汛期水文隐患报告（补录）</span></div><div class=\"doc-kv\"><span class=\"k\">原报告作者</span><span class=\"v\">陈望</span></div><div class=\"doc-kv\"><span class=\"k\">原报告日期</span><span class=\"v\">1980年8月4日</span></div><div class=\"doc-kv\"><span class=\"k\">补录归档日期</span><span class=\"v\"><span class=\"crossed\">1980年8月4日</span>1980年8月5日</span></div><div class=\"doc-kv\"><span class=\"k\">档号</span><span class=\"v\">781（P44-08）</span></div><div class=\"doc-kv\"><span class=\"k\">保管期限</span><span class=\"v\">永久</span></div></div><p class=\"doc-p\">本档案由查阅人代为补录。原件遗失四十六年，卷内材料经核校无误，现已完成归档。上游三村已于1998年整体搬迁，原址没入库区，故水文观测断面不再复设。补录须由查阅人签名确认，签名一经提交，即视为签名人自愿并入本卷，档案室不再另行通知。</p><div class=\"doc-note\">系统预写警示（1980年8月4日 23:59 写入）：三年后的1983年7月31日，汉江上游大水，安康城区被淹。</div><div class=\"doc-note\">关联观测点：白河水文站、安康水文站。本页一式一份，签名后不可撤销。</div><div class=\"doc-sign\">秦巴县档案馆　一九八〇年八月五日</div><div class=\"stamp\">秦巴县档案馆 档案室</div>"
+    }
+  ];
+  var SITE = {
+  "intro": "秦巴县地处秦巴山区腹地，汉江自西向东穿境而过，境内山高谷深，沟溪密布。洞河与汝河于洞河镇一带汇入汉江，沿江旧有渡口数处，为山区群众往来要道。本馆为县级综合档案馆，1958年建馆，馆藏以民国时期文书及建国后机关档案为主，兼收水文、气象、图书等专门材料。截至1980年，馆藏档案3.2万卷、资料4700册，其中永久卷1.1万卷。馆内设查阅室、库房、缩微与复印室，实行凭单位介绍信查阅制度。",
+  "notices": [
+    "查阅时间调整通知：自1980年8月1日起，查阅室开放时间改为上午八时至十一时三十分、下午二时三十分至五时三十分。",
+    "文书立卷归档通知：各机关、团体、企事业单位应于九月底前完成本年度立卷归档，案卷质量按《文书档案保管期限表》执行。",
+    "闭馆整库通知：定于1980年8月6日至8月20日闭馆整库，进行档案除尘、倒架及温湿度检测，期间暂停查阅。",
+    "档案复制收费通知：静电复印每页收费一角五分，缩微拍照另计，复制须经档案室核准并填写复制登记单。",
+    "库房温湿度检测通知：定于每月十日上午检测一至三号库房，检测期间暂停调卷，各室提前报送借卷计划。"
+  ],
+  "emptyResult": "未检索到符合条件的档案，请更换检索项或关键词后重试。",
+  "hintTitle": ["全文", "档号", "题名", "责任者"],
+  "footerNote": "本站为虚构作品，与任何真实档案馆及机构无关。"
+};
+
+  /* ---------- 本地存储 ---------- */
+  var KEY = 'qinba_archive_v2';
+  var DEFAULT = {
+    opened: [],          // 已打开过的档案 id
+    found: [],           // 已检索出来过的档案 id（用于关卡判定：前一步的档案得先被调出来）
+    signer: '',          // 补录人
+    archived: false,     // 是否已被归档
+    scanFixed: false,    // 档案4 扫描件是否已恢复
+    booted: false
+  };
+  var state = load();
+
+  function load() {
+    var s = {}, k;
+    for (k in DEFAULT) { s[k] = DEFAULT[k]; }
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) {
+        var o = JSON.parse(raw);
+        if (o && typeof o === 'object') {
+          if (Array.isArray(o.opened)) s.opened = o.opened.filter(function (n) { return typeof n === 'number'; });
+          if (Array.isArray(o.found)) s.found = o.found.filter(function (n) { return typeof n === 'number'; });
+          if (typeof o.signer === 'string') s.signer = o.signer;
+          if (typeof o.archived === 'boolean') s.archived = o.archived;
+          if (typeof o.scanFixed === 'boolean') s.scanFixed = o.scanFixed;
+          if (typeof o.booted === 'boolean') s.booted = o.booted;
+        }
+      }
+    } catch (e) {}
+    return s;
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  /* ---------- 工具 ---------- */
+  function $(s) { return document.querySelector(s); }
+  function byId(id) { for (var i = 0; i < ARCHIVES.length; i++) { if (ARCHIVES[i].id === id) return ARCHIVES[i]; } return null; }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+  function has(id) { return state.opened.indexOf(id) !== -1; }
+  function found(id) { return state.found.indexOf(id) !== -1; }
+  function markFound(id) {
+    if (state.found.indexOf(id) === -1) { state.found.push(id); save(); }
+  }
+
+  /* ---------- 系统时间 ----------
+     正常情况：打开一份档案，时间往前走一格。
+     第 6 份（归档确认）→ 翻到 1980-08-05 00:00。
+     已被归档后重新打开 → 永远回到 1980-08-04 06:00。 */
+  var STAGES = ['06:00', '12:00', '17:00', '19:00', '23:59'];
+  var startedArchived = !!state.archived;
+
+  /* 终局档案的 id（JSON 里标了 final: true 的那一份） */
+  var FINAL_ID = (function () {
+    for (var i = 0; i < ARCHIVES.length; i++) { if (ARCHIVES[i].final) { return ARCHIVES[i].id; } }
+    return 12;
+  })();
+
+  function clockText() {
+    if (startedArchived) return '1980-08-04 06:00';
+    if (has(FINAL_ID)) return '1980-08-05 00:00';
+    return '1980-08-04 ' + STAGES[Math.min(state.opened.length, STAGES.length - 1)];
+  }
+  function renderClock() {
+    $('#sysClock').textContent = '系统时间：' + clockText();
+  }
+
+  /* ---------- 视图切换 ---------- */
+  var VIEWS = ['home', 'about', 'search', 'service', 'law', 'doc'];
+  var CRUMBS = {
+    home: '首页', about: '本馆概况', search: '馆藏检索',
+    service: '利用服务', law: '政策法规', doc: '馆藏检索'
+  };
+
+  function show(view, crumbExtra) {
+    VIEWS.forEach(function (v) {
+      var el = document.getElementById('view-' + v);
+      if (el) { el.hidden = (v !== view); }
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('#nav a'), function (a) {
+      a.classList.toggle('on', a.getAttribute('data-view') === view);
+    });
+    var c = '当前位置：<b>' + CRUMBS[view] + '</b>';
+    if (crumbExtra) { c += ' &gt; <b>' + esc(crumbExtra) + '</b>'; }
+    $('#crumb').innerHTML = c;
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest('[data-view]');
+    if (!a) return;
+    ev.preventDefault();
+    var v = a.getAttribute('data-view');
+    show(v);
+    if (v === 'search') {
+      var q = $('#mainSearchForm .q');
+      if (q) { q.focus(); }
+    }
+  });
+
+  /* ---------- 静态文案 ---------- */
+  function renderStatic() {
+    if (SITE.intro) {
+      $('#homeIntro').textContent = SITE.intro;
+      $('#aboutIntro').textContent = SITE.intro;
+    }
+    if (SITE.footerNote) { $('#footerNote').textContent = SITE.footerNote; }
+
+    var list = $('#noticeList');
+    list.innerHTML = '';
+    /* 二周目：公告栏第一条变成一句问候 */
+    if (state.archived && state.signer) {
+      var li0 = document.createElement('li');
+      li0.className = 'odd';
+      li0.textContent = '欢迎回来，陈望。';
+      list.appendChild(li0);
+    }
+    (SITE.notices || []).forEach(function (n) {
+      var li = document.createElement('li');
+      li.innerHTML = '<a href="#" onclick="return false">' + esc(n) + '</a>';
+      list.appendChild(li);
+    });
+  }
+
+  /* ---------- 检索规则 ----------
+     完全不给提示：玩家从档案内容里自己找下一个词。 */
+  function norm(s) {
+    return String(s == null ? '' : s)
+      .replace(/[\s\u3000]+/g, '')
+      .replace(/[０-９]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); })
+      .replace(/[，,。．.、·:：;；"'“”‘’（）()【】\[\]《》<>／\/\-—_]/g, '')
+      .toLowerCase();
+  }
+
+  /* 检索规则表
+     keys  : 能命中这份（些）档案的输入（已做过 norm 归一化：去空格、去标点、全角数字转半角、转小写）
+     ids   : 命中后调出的档案（一个答案可以同时调出好几份，像真档案一样）
+     need  : 前置条件（必须先打开过的档案 id；0 表示无前置）——对应“库里还没有这份档案” */
+  var RULES = [
+    { keys: ['p4408', '781', '781号', '78101'], ids: [1], need: 0 },
+    { keys: ['陈望'], ids: [2], need: 1 },
+    { keys: ['水文观测站', '观测站', '后山'], ids: [3], need: 2 },
+    { keys: ['基础气象观测', '气象观测'], ids: [4], need: 3 },
+    { keys: ['183', '第183页', '183页'], ids: [5], need: 4 },
+    { keys: ['1577'], ids: [6], need: 5 },
+    { keys: ['31000', '3.1万', '三万一千'], ids: [7], need: 6 },
+    { keys: ['1934', '民国二十三年'], ids: [8, 9], need: 7 },
+    { keys: ['汝河'], ids: [10, 11], need: 8 },
+    { keys: ['25923', '二百五十九点二三'], ids: [12], need: 9 }
+  ];
+
+  function ruleHit(rule, n) {
+    for (var i = 0; i < rule.keys.length; i++) {
+      if (n.indexOf(rule.keys[i]) !== -1) { return true; }
+    }
+    return false;
+  }
+
+  /* 检索：命中规则 → 返回对应档案；另外把已打开过、且元数据里含关键词的档案一并列出（像真检索一样） */
+  function search(q) {
+    var n = norm(q);
+    var hits = [];
+    if (!n) { return hits; }
+
+    /* 1) 规则命中
+       need 没满足 → 直接当作“库里还没有这份档案”，连元数据兜底也不做 */
+    for (var i = 0; i < RULES.length; i++) {
+      var r = RULES[i];
+      if (!ruleHit(r, n)) { continue; }
+      if (r.need && !found(r.need)) { return []; }
+      r.ids.forEach(function (id) {
+        var a = byId(id);
+        if (a) { hits.push({ a: a, fresh: !has(a.id) }); }
+      });
+      break;
+    }
+
+    /* 2) 已公开档案里的元数据/全文命中 */
+    state.opened.forEach(function (id) {
+      var a = byId(id);
+      if (!a) return;
+      if (hits.some(function (h) { return h.a.id === id; })) return;
+      var hay = [a.code, a.title, a.author, a.kind, (a.body || '').replace(/<[^>]+>/g, '')].join(' ');
+      if (norm(hay).indexOf(n) !== -1) { hits.push({ a: a, fresh: false }); }
+    });
+
+    /* 3) 新命中的排前面 */
+    hits.sort(function (x, y) { return (y.fresh ? 1 : 0) - (x.fresh ? 1 : 0); });
+    return hits;
+  }
+
+  function doSearch(form) {
+    var q = form.querySelector('.q').value;
+    var field = form.querySelector('.field').value;
+    var hits = search(q);
+
+    show('search');
+    var panel = $('#resultPanel');
+    var head = $('#resultHead');
+    var body = $('#resultBody');
+    panel.hidden = false;
+
+    if (!hits.length) {
+      head.textContent = '检索结果';
+      body.innerHTML = '<div class="empty">' + esc(SITE.emptyResult || '未检索到符合条件的档案。') + '</div>';
+      return;
+    }
+
+    head.textContent = '检索结果（' + hits.length + ' 条）　检索项：' + field + '　关键词：' + q;
+
+    /* 出现在检索结果里 = 已经调出来过，后面几步的关卡据此放行 */
+    hits.forEach(function (h) { markFound(h.a.id); });
+
+    var rows = hits.map(function (h, i) {
+      var a = h.a;
+      var stateTxt = (a.status === '待解密')
+        ? '<span class="state-wait">待解密</span>'
+        : '<span class="state-ok">已解密</span>';
+      return '<tr>' +
+        '<td class="num">' + (i + 1) + '</td>' +
+        '<td class="hide-sm">' + esc(a.code) + '</td>' +
+        '<td><a href="#" data-doc="' + a.id + '">' + esc(a.title) + '</a></td>' +
+        '<td class="hide-sm">' + esc(a.author) + '</td>' +
+        '<td class="hide-sm">' + esc(a.date) + '</td>' +
+        '<td class="c">' + stateTxt + '</td>' +
+        '<td class="c"><a href="#" data-doc="' + a.id + '">查看</a></td>' +
+      '</tr>';
+    }).join('');
+
+    /* 已被归档：结果表最底部多一条系统自动生成的条目 */
+    if (state.archived && state.signer) {
+      rows += '<tr>' +
+        '<td class="num">' + (hits.length + 1) + '</td>' +
+        '<td class="hide-sm">临时-001</td>' +
+        '<td><a href="#" data-doc="ghost">《' + esc(state.signer) + '·存在性登记》</a></td>' +
+        '<td class="hide-sm">本系统</td>' +
+        '<td class="hide-sm">2026-10-27</td>' +
+        '<td class="c"><span class="state-ok">已归档</span></td>' +
+        '<td class="c"><a href="#" data-doc="ghost">查看</a></td>' +
+      '</tr>';
+    }
+
+    body.innerHTML = '<table class="tbl"><thead><tr>' +
+      '<th>序号</th><th class="hide-sm">档号</th><th>题名</th><th class="hide-sm">责任者</th>' +
+      '<th class="hide-sm">形成时间</th><th>状态</th><th>操作</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  /* 首页 / 检索页两个表单共用一套逻辑 */
+  ['homeSearchForm', 'mainSearchForm'].forEach(function (id) {
+    var f = document.getElementById(id);
+    if (!f) return;
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      doSearch(f);
+    });
+  });
+
+  /* ---------- 打开档案 ---------- */
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest('[data-doc]');
+    if (!a) return;
+    ev.preventDefault();
+    var id = a.getAttribute('data-doc');
+    if (id === 'ghost') { openGhost(); return; }
+    openDoc(parseInt(id, 10));
+  });
+
+  function openDoc(id) {
+    var a = byId(id);
+    if (!a) return;
+    if (!has(id)) { state.opened.push(id); save(); }
+    renderClock();
+    show('doc', a.title);
+
+    var meta = '' +
+      '<table class="meta">' +
+        '<tr><th>档　号</th><td>' + esc(a.code) + '</td><th>文　种</th><td>' + esc(a.kind) + '</td></tr>' +
+        '<tr><th>责任者</th><td>' + esc(a.author) + '</td><th>形成时间</th><td>' + esc(a.date) + '</td></tr>' +
+        '<tr><th>保管期限</th><td>' + esc(a.period) + '</td><th>状　态</th><td>' + esc(a.status) + '</td></tr>' +
+      '</table>';
+
+    $('#docWrap').innerHTML = '' +
+      '<div class="doc-head">' +
+        '<h2>' + esc(a.title) + '</h2>' +
+        '<div class="sub">秦巴县档案馆　数字副本　档号 ' + esc(a.code) + '</div>' +
+      '</div>' +
+      meta +
+      '<div class="doc-body">' + (a.body || '') + '</div>' +
+      attachHTML(a);
+
+    if (a.id === 4) { bindScan(); }
+    if (a.final) {
+      /* 归档确认页底部追加补录区：未签名显示表单，已签名显示凭证 */
+      var box = document.createElement('div');
+      box.id = 'signArea';
+      document.getElementById('docWrap').appendChild(box);
+      renderSignArea();
+    }
+  }
+
+  function attachHTML(a) {
+    if (a.id === 4) {
+      var fixed = state.scanFixed;
+      return '' +
+        '<div class="attach">' +
+          '<div class="attach-h">附件：数字化扫描件（第 183 页，局部）</div>' +
+          '<img id="scanImg" src="assets/images/' + (fixed ? 'letter-corner.jpg' : 'broken-image.jpg') + '" alt="扫描件">' +
+          '<div class="scan-err" id="scanErr">' +
+            (fixed
+              ? '<span class="scan-ok">扫描件已恢复：第 183 页（局部）</span>'
+              : '扫描件加载失败（HTTP 404）　<a href="#" id="scanReload">重新加载</a>') +
+          '</div>' +
+        '</div>';
+    }
+    var imgMap = {
+      1: ['book-cover.jpg', '《基础气象观测》封面（1980 年第三次印刷）'],
+      2: ['index-card.jpg', '人物索引卡（原件扫描）'],
+      3: ['duty-log.jpg', '值班日志（1980 年 7 月 30 日）'],
+      5: ['letter-page.jpg', '第 183 页信纸（原件扫描）'],
+      6: ['shouwenbu.jpg', '收文登记簿（1980 年 8 月）'],
+      7: ['jianbao.jpg', '防汛简报 第八期（1983 年 8 月 5 日）'],
+      8: ['baihe-log.jpg', '白河水文站汛期观测记录（抄件）'],
+      10: ['banqian.jpg', '上游三村移民搬迁登记表（1998 年 5 月）']
+    };
+    var it = imgMap[a.id];
+    if (!it) { return ''; }
+    return '' +
+      '<details class="attach">' +
+        '<summary>附件：数字化扫描件（1 页）　点击展开</summary>' +
+        '<img src="assets/images/' + it[0] + '" alt="' + esc(it[1]) + '" loading="lazy">' +
+        '<div class="attach-h" style="margin-top:6px;">' + esc(it[1]) + '</div>' +
+      '</details>';
+  }
+
+  /* ---------- 档案4：扫描件恢复（长按 2 秒 / 右键 / 点“重新加载”） ---------- */
+  function bindScan() {
+    var img = $('#scanImg');
+    if (!img || state.scanFixed) return;
+
+    var timer = null;
+    function start() { clearTimeout(timer); timer = setTimeout(fixScan, 2000); }
+    function stop() { clearTimeout(timer); }
+
+    img.addEventListener('touchstart', start, { passive: true });
+    img.addEventListener('touchend', stop);
+    img.addEventListener('touchmove', stop, { passive: true });
+    img.addEventListener('touchcancel', stop);
+    img.addEventListener('mousedown', function (e) { if (e.button === 0) { start(); } });
+    img.addEventListener('mouseup', stop);
+    img.addEventListener('mouseleave', stop);
+    img.addEventListener('contextmenu', function (e) { e.preventDefault(); fixScan(); });
+
+    var reload = $('#scanReload');
+    if (reload) {
+      reload.addEventListener('click', function (e) { e.preventDefault(); fixScan(); });
+    }
+  }
+
+  function fixScan() {
+    if (state.scanFixed) return;
+    state.scanFixed = true;
+    save();
+    var img = $('#scanImg');
+    var err = $('#scanErr');
+    if (img) { img.src = 'assets/images/letter-corner.jpg'; }
+    if (err) { err.innerHTML = '<span class="scan-ok">扫描件已恢复：第 183 页（局部）</span>'; }
+  }
+
+  /* ---------- 档案6：补录归档 ---------- */
+  function renderSignArea() {
+    var box = $('#signArea');
+    if (!box) return;
+    if (!state.signer) {
+      box.innerHTML = '' +
+        '<div class="signbox">' +
+          '<div class="h">补录归档</div>' +
+          '<label>补录人签名：<input id="signerInput" type="text" maxlength="12" placeholder="请输入姓名"></label>' +
+          '<button id="signBtn" type="button">提交归档</button>' +
+        '</div>';
+    } else {
+      var name = esc(state.signer);
+      box.innerHTML = '' +
+        '<div class="cert" id="cert">' +
+          '<h3>档案补录凭证</h3>' +
+          '<div class="no">编号：781　类别：水文 · 汛期隐患</div>' +
+          '<p>兹证明，781 号档案《1980 年汛期水文隐患报告》已于 1980 年 8 月 5 日完成补录归档。原报告作者陈望同志于 1980 年 8 月 4 日寄送途中失踪，报告遗失四十六年。今日由补录人【' + name + '】代为补录，特此归档。</p>' +
+          '<p class="remark">备注：谨以此档案，纪念报告作者陈望同志。上游三村，已于 1998 年整体搬迁，无人伤亡。</p>' +
+          '<img class="seal" src="assets/images/seal.jpg" alt="秦巴县档案馆 档案补录专用章">' +
+          '<div class="foot">秦巴县档案馆　一九八〇年八月五日</div>' +
+        '</div>' +
+        '<button class="print-btn no-print" id="printBtn" type="button">打印凭证</button>';
+    }
+    bindSign();
+  }
+
+  function bindSign() {
+    var btn = $('#signBtn');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        var input = $('#signerInput');
+        var name = (input && input.value ? input.value : '').trim();
+        if (!name) { if (input) { input.focus(); } return; }
+        state.signer = name.slice(0, 12);
+        state.archived = true;
+        save();
+        renderSignArea();
+        renderClock();
+      });
+    }
+    var printBtn = $('#printBtn');
+    if (printBtn) { printBtn.addEventListener('click', function () { window.print(); }); }
+  }
+
+  /* ---------- 《存在性登记》 ---------- */
+  function openGhost() {
+    if (!state.signer) return;
+    var name = esc(state.signer);
+    show('doc', '《' + state.signer + '·存在性登记》');
+    $('#docWrap').innerHTML = '' +
+      '<div class="doc-head">' +
+        '<h2>《' + name + '·存在性登记》</h2>' +
+        '<div class="sub">秦巴县档案馆　数字副本　档号 临时-001</div>' +
+      '</div>' +
+      '<table class="meta">' +
+        '<tr><th>档　号</th><td>临时-001</td><th>文　种</th><td>登记表</td></tr>' +
+        '<tr><th>责任者</th><td>本系统</td><th>形成时间</th><td>2026-10-27</td></tr>' +
+        '<tr><th>保管期限</th><td>永久</td><th>状　态</th><td>已归档</td></tr>' +
+      '</table>' +
+      '<div class="doc-body">' +
+        '<p class="doc-p">本档案由系统自动生成。</p>' +
+        '<p class="doc-p">查询人' + name + '，于 2026 年检索 781 号档案时，被一并归档。</p>' +
+        '<p class="doc-p">感谢查询。</p>' +
+      '</div>';
+  }
+
+  /* ---------- 启动 ---------- */
+  renderClock();
+  renderStatic();
+  show('home');
+  state.booted = true;
+  save();
+
+  /* ---------- PWA ---------- */
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+})();
+</script>
+</body>
+</html>
