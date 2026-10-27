@@ -270,6 +270,27 @@ ul.plain li::before{ content:"·"; position:absolute; left:.25em; color:#999; }
 ol.plain{ margin:.6em 0; padding-left:1.8em; }
 ol.plain li{ margin:.25em 0; }
 .page-main .b table.doc-table{ font-size:14px; }
+/* 检索帮助（分级提示）与搜索建议 */
+.hint-link{ margin-top:10px; font-size:12.5px; }
+.hint-link a{ color:var(--gray); }
+.hint-panel{
+  margin-top:10px; border:1px solid #d9e2ec; background:#f7fafd; padding:12px 14px;
+  font-size:13.5px; line-height:1.9; color:#33475f;
+}
+.hint-panel .t{ color:var(--blue-d); font-weight:700; margin-bottom:6px; }
+.hint-panel .lv{ color:#8a8a8a; font-size:12px; margin-bottom:6px; }
+.hint-panel .more{ margin-top:8px; }
+.hint-panel .more a{ font-size:13px; }
+.suggest{ margin-top:10px; font-size:13.5px; color:#555; }
+.suggest a{ margin-right:10px; padding:1px 7px; border:1px solid #d9e2ec; background:#fff; border-radius:2px; }
+/* 崩坏样式 */
+.row-dup td{ color:#8a6a6a; }
+.rot{ color:#9a9a9a; }
+.rot-strong{ background:#2b2b2b; color:#6d6d6d; padding:0 .3em; letter-spacing:.1em; }
+.notfound{ padding:34px 18px; text-align:center; color:#666; font-family:var(--font-ui); }
+.notfound .code{ font-size:38px; color:#bbb; letter-spacing:.1em; margin-bottom:10px; }
+.notfound .msg{ font-size:14px; }
+
 /* 登录表单（仅“用户登录”一页用） */
 .login-form{ margin:.6em 0 1em; max-width:420px; }
 .login-form input{
@@ -436,6 +457,9 @@ body.fs-l .wrap{ zoom:1.12; }
             <button type="submit">检　索</button>
           </form>
           <div class="search-tip" id="searchTip">可检索项：全文、档号、题名、责任者。</div>
+          <div class="suggest" id="suggestBox" hidden></div>
+          <div class="hint-link"><a href="#" id="hintToggle">检索帮助</a></div>
+          <div class="hint-panel" id="hintPanel" hidden></div>
         </div>
       </div>
 
@@ -881,6 +905,29 @@ body.fs-l .wrap{ zoom:1.12; }
     return hits;
   }
 
+  /* 崩坏期：公告栏自己多一条 */
+  function syncDecayUI() {
+    var lv = decayLevel();
+    var list = document.getElementById('noticeList');
+    if (!list) { return; }
+    var has = document.getElementById('decayNotice');
+    if (lv >= 2 && !has) {
+      var li = document.createElement('li');
+      li.id = 'decayNotice';
+      li.className = 'odd';
+      li.textContent = '关于部分档案著录异常的说明';
+      list.insertBefore(li, list.firstChild);
+    } else if (lv < 2 && has) {
+      has.parentNode.removeChild(has);
+    }
+
+    /* 崩坏后期：搜索框的提示语被改掉 */
+    var q = document.querySelector('#mainSearchForm .q');
+    if (q) {
+      q.setAttribute('placeholder', lv >= 3 ? '你在找谁？' : '请输入档号、题名、责任者或关键词');
+    }
+  }
+
   function doSearch(form) {
     var q = form.querySelector('.q').value;
     var field = form.querySelector('.field').value;
@@ -893,12 +940,31 @@ body.fs-l .wrap{ zoom:1.12; }
     panel.hidden = false;
 
     if (!hits.length) {
+      missCount++;
       head.textContent = '检索结果';
-      body.innerHTML = '<div class="empty">' + esc(SITE.emptyResult || '未检索到符合条件的档案。') + '</div>';
+      var msg = SITE.emptyResult || '未检索到符合条件的档案。';
+      var lv = decayLevel();
+      if (lv >= 3) {
+        msg = '未检索到相关档案。……你要找的东西，确定存在吗？';
+      } else if (lv >= 1 && missCount >= 3) {
+        msg += '（该条目著录信息不完整，可尝试更换检索项）';
+      }
+      body.innerHTML = '<div class="empty">' + esc(msg) + '</div>';
+      showSuggest();
       return;
     }
+    missCount = 0;
+    hideSuggest();
+    syncDecayUI();
 
-    head.textContent = '检索结果（' + hits.length + ' 条）　检索项：' + field + '　关键词：' + q;
+    var lvNow = decayLevel();
+    var shownCount = hits.length;
+    if (lvNow >= 2 && Math.random() < 0.6) {
+      /* 条数和实际行数对不上——像数据库出了问题 */
+      shownCount = hits.length + (Math.random() < 0.5 ? 1 : -1);
+      if (shownCount < 1) { shownCount = 1; }
+    }
+    head.textContent = '检索结果（' + shownCount + ' 条）　检索项：' + field + '　关键词：' + q;
 
     /* 出现在检索结果里 = 已经调出来过，后面几步的关卡据此放行 */
     hits.forEach(function (h) { markFound(h.a.id); });
@@ -918,6 +984,25 @@ body.fs-l .wrap{ zoom:1.12; }
         '<td class="c"><a href="#" data-doc="' + a.id + '">查看</a></td>' +
       '</tr>';
     }).join('');
+
+    /* 崩坏：偶尔多出一条“重复著录”的副本 */
+    if (lvNow >= 1 && Math.random() < 0.35) {
+      var d0 = hits[0].a;
+      rows += '<tr class="row-dup"><td class="num">' + (hits.length + 1) + '</td>' +
+        '<td class="hide-sm">' + esc(d0.code) + '</td>' +
+        '<td><a href="#" data-doc="' + d0.id + '">' + esc(d0.title) + '</a>（重复著录）</td>' +
+        '<td class="hide-sm">' + esc(d0.author) + '</td>' +
+        '<td class="hide-sm">' + esc(d0.date) + '</td>' +
+        '<td class="c">待核</td><td class="c">—</td></tr>';
+    }
+    /* 崩坏后期：结果里混进一条没有内容的档案 */
+    if (lvNow >= 3) {
+      rows += '<tr class="row-dup"><td class="num">—</td>' +
+        '<td class="hide-sm">—</td>' +
+        '<td><a href="#" data-doc="90">（无题）</a></td>' +
+        '<td class="hide-sm">—</td><td class="hide-sm">1980-08-04</td>' +
+        '<td class="c">待解密</td><td class="c"><a href="#" data-doc="90">查看</a></td></tr>';
+    }
 
     /* 已被归档：结果表最底部多一条系统自动生成的条目 */
     if (state.archived && state.signer) {
@@ -959,6 +1044,8 @@ body.fs-l .wrap{ zoom:1.12; }
   });
 
   function openDoc(id) {
+    /* 崩坏后期混进来的空白档案 */
+    if (id === 90) { openBlankDoc(); return; }
     var a = byId(id);
     if (!a) return;
     if (!has(id)) { state.opened.push(id); save(); }
@@ -980,6 +1067,21 @@ body.fs-l .wrap{ zoom:1.12; }
       meta +
       '<div class="doc-body">' + (a.body || '') + '</div>' +
       attachHTML(a);
+
+    /* 崩坏：正文末尾多出一段重复、错乱的著录信息 */
+    if (decayLevel() >= 2 && Math.random() < 0.45) {
+      var bodyEl = document.querySelector('#docWrap .doc-body');
+      if (bodyEl) {
+        var firstLine = (a.body || '').replace(/<[^>]+>/g, '').slice(0, 26);
+        var junk = document.createElement('div');
+        junk.className = 'doc-note rot';
+        junk.innerHTML = esc(firstLine) + '……' + esc(firstLine) + '……' +
+          '<span class="rot-strong">著录重复</span>　本条记录于 1980-08-04 由系统自动生成，无原始凭证。';
+        bodyEl.appendChild(junk);
+      }
+    }
+
+    syncDecayUI();
 
     if (a.id === 4) { bindScan(); }
     if (a.final) {
@@ -1206,6 +1308,14 @@ body.fs-l .wrap{ zoom:1.12; }
   function openPage(id) {
     var p = PAGE_INDEX[id];
     if (!p) { return; }
+
+    /* 崩坏：该单位、该栏目开始不存在了 */
+    var lv0 = decayLevel();
+    if (lv0 >= 4 || (lv0 >= 3 && p.secKey === 'about')) {
+      notFound(p.section);
+      return;
+    }
+
     show('page', p.title);
     document.getElementById('crumb').innerHTML =
       '当前位置：<b>' + esc(p.section) + '</b> &gt; <b>' + esc(p.title) + '</b>';
@@ -1303,6 +1413,247 @@ body.fs-l .wrap{ zoom:1.12; }
       out.textContent = '用户名或密码不正确。本系统账号由办公室统一分配，如有疑问请与办公室联系（内线 8021）。';
     }
   });
+
+  /* =======================================================================
+     一、递进式崩坏：玩得越深，系统越不对劲
+     0 = 正常；1 = 出现裂缝；2 = 明显故障；3 = 系统开始“说话”；4 = 崩坏
+     ======================================================================= */
+  function decayLevel() {
+    if (state.archived && !startedArchived) { return 4; }   /* 刚补录完：当场崩 */
+    if (startedArchived) { return 2; }                       /* 二周目：还在，但不对 */
+    var n = state.found.length;
+    if (n >= 9) { return 3; }
+    if (n >= 6) { return 2; }
+    if (n >= 3) { return 1; }
+    return 0;
+  }
+
+  var missCount = 0;
+
+  /* 空白档案：崩坏后期混进检索结果的那一条 */
+  function openBlankDoc() {
+    show('doc', '（无题）');
+    document.getElementById('docWrap').innerHTML =
+      '<div class="doc-head"><h2>（无题）</h2>' +
+      '<div class="sub">秦巴县档案馆　数字副本　档号 —</div></div>' +
+      '<table class="meta">' +
+        '<tr><th>档　号</th><td>—</td><th>文　种</th><td>—</td></tr>' +
+        '<tr><th>责任者</th><td>—</td><th>形成时间</th><td>1980-08-04</td></tr>' +
+        '<tr><th>保管期限</th><td>—</td><th>状　态</th><td>待解密</td></tr>' +
+      '</table>' +
+      '<div class="doc-body">' +
+        '<p class="doc-p rot">（本页内容无法显示）</p>' +
+        '<p class="doc-p rot">……</p>' +
+        '<p class="doc-p rot">这一页是空的。可它明明是你自己检索出来的。</p>' +
+      '</div>';
+  }
+
+  /* 页面不存在 */
+  function notFound(what) {
+    show('page', '页面不存在');
+    document.getElementById('crumb').innerHTML = '当前位置：<b>' + esc(what || '页面') + '</b>';
+    document.getElementById('pageWrap').innerHTML =
+      '<div class="page-main"><div class="b"><div class="notfound">' +
+        '<div class="code">404</div>' +
+        '<div class="msg">您访问的页面不存在，或已被删除。</div>' +
+      '</div></div></div>';
+  }
+
+  /* =======================================================================
+     二、分级提示：知道玩家卡在哪一步，一次只多给一点
+     ======================================================================= */
+  var HINTS = [
+    { stage: '从入口开始', list: [
+      '先看看那张借书卡上写着什么。',
+      '卡上有一个「索引号」，检索项选「档号」，把它原样输进去。',
+      '输入 P44-08。'
+    ] },
+    { stage: '第一份：卷宗目录', list: [
+      '目录里反复出现同一个人的名字。',
+      '「责任者」那一栏写的是谁？',
+      '输入 陈望。'
+    ] },
+    { stage: '第二份：人物索引卡', list: [
+      '卡片上有他长期待着的地方。',
+      '看「驻点」那一栏。',
+      '输入 水文观测站。'
+    ] },
+    { stage: '第三份：值班日志', list: [
+      '批注里提到一本书，还有一个页码。',
+      '那本书叫《基础气象观测》。',
+      '输入 基础气象观测。'
+    ] },
+    { stage: '第四份：借阅记录', list: [
+      '记录末尾的数字化说明提到第 183 页扫描件损坏了，附件里能看到一部分。',
+      '把附件里那张「加载失败」的图打开：右键、长按两秒，或点「重新加载」。',
+      '看到 183 就输入 183。'
+    ] },
+    { stage: '第五份：第 183 页信纸', list: [
+      '信末红笔是三个词，下面的铅笔字在问一件事：这条江有多长。',
+      '这句话要用站外的东西回答——打开地图软件，搜「紫阳县 洞河镇」，看渡口边那条江叫什么。',
+      '那条江是汉江，全长约 1577 公里。输入 1577。'
+    ] },
+    { stage: '第六份：收文簿', list: [
+      '页末铅笔批注说「三年后的七月三十一日一一应验」，还问「洪峰几何」。',
+      '这是要你去查真实发生的那场洪水：1983 年 7 月 31 日安康。',
+      '安康城区段洪峰流量 31000 立方米每秒。输入 31000。'
+    ] },
+    { stage: '第七份：防汛简报', list: [
+      '简报说白河水文站「自设站以来，以此为最大洪峰，设站年份见该站站志」。',
+      '去查白河水文站的设站年份。',
+      '1934 年 12 月设站。输入 1934。'
+    ] },
+    { stage: '第八、九份：白河记录与检修单', list: [
+      '检修单写取水样点在「三水交汇处上游」，三水只载其二，第三条「待核」。',
+      '去查紫阳县洞河镇——汉江、洞河之外，还有哪条河在这里汇入？',
+      '第三条是汝河。输入 汝河。'
+    ] },
+    { stage: '第十一份：人事档案', list: [
+      '附注说「本卷所载水势，以一九八三年七月三十一日安康城区段水位高程为准」。',
+      '去查那场洪水的水位高程。',
+      '水位高程 259.23 米。输入 259.23。'
+    ] },
+    { stage: '终局', list: [
+      '卷宗已经调全了，回到归档确认页往下翻。',
+      '在「补录人签名」里写下你自己的名字。',
+      '——然后刷新首页，看看公告栏。'
+    ] }
+  ];
+
+  var hintLevel = 0;
+
+  function hintStageIndex() {
+    if (!found(1)) { return 0; }
+    if (!found(2)) { return 1; }
+    if (!found(3)) { return 2; }
+    if (!found(4)) { return 3; }
+    if (!found(5)) { return 4; }
+    if (!found(6)) { return 5; }
+    if (!found(7)) { return 6; }
+    if (!found(8) || !found(9)) { return 7; }
+    if (!found(10) || !found(11)) { return 8; }
+    if (!found(12)) { return 9; }
+    return 10;
+  }
+
+  var hintToggle = document.getElementById('hintToggle');
+  var hintPanel = document.getElementById('hintPanel');
+
+  function renderHint() {
+    var idx = hintStageIndex();
+    var h = HINTS[idx];
+    var show = h.list.slice(0, hintLevel + 1);
+    var html = '<div class="t">检索帮助 · ' + esc(h.stage) + '</div>' +
+      '<div class="lv">提示 ' + (hintLevel + 1) + ' / ' + h.list.length + '</div>';
+    show.forEach(function (line, i) {
+      html += '<div>' + (i + 1) + '. ' + esc(line) + '</div>';
+    });
+    if (hintLevel + 1 < h.list.length) {
+      html += '<div class="more"><a href="#" id="hintMore">再具体一点</a></div>';
+    } else {
+      html += '<div class="more rot">没有更具体的了。</div>';
+    }
+    hintPanel.innerHTML = html;
+    var more = document.getElementById('hintMore');
+    if (more) {
+      more.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        hintLevel = Math.min(hintLevel + 1, h.list.length - 1);
+        renderHint();
+      });
+    }
+  }
+
+  if (hintToggle && hintPanel) {
+    hintToggle.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      if (hintPanel.hidden) {
+        hintPanel.hidden = false;
+        hintLevel = 0;
+        renderHint();
+      } else {
+        hintPanel.hidden = true;
+      }
+    });
+  }
+
+  /* =======================================================================
+     三、搜索建议：连续查不到时，像真检索系统那样给“您是不是要找”
+     ======================================================================= */
+  var suggestBox = document.getElementById('suggestBox');
+
+  function hideSuggest() {
+    if (suggestBox) { suggestBox.hidden = true; suggestBox.innerHTML = ''; }
+  }
+
+  function showSuggest() {
+    if (!suggestBox) { return; }
+    var idx = hintStageIndex();
+    if (idx >= HINTS.length) { return; }
+    var h = HINTS[idx];
+    var words = [];
+    h.list.forEach(function (line) {
+      var m = line.match(/输入\s*([^\s。，]+)/);
+      if (m) { words.push(m[1]); }
+    });
+    if (!words.length) { hideSuggest(); return; }
+    /* 查不到 2 次给第一个词，查不到 4 次给全部 */
+    var use = missCount >= 4 ? words : words.slice(0, 1);
+    suggestBox.hidden = false;
+    suggestBox.innerHTML = '您是不是要找：' + use.map(function (w) {
+      return '<a href="#" data-sug="' + esc(w) + '">' + esc(w) + '</a>';
+    }).join('');
+  }
+
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest('[data-sug]');
+    if (!a) { return; }
+    ev.preventDefault();
+    var v = a.getAttribute('data-sug');
+    var f = document.getElementById('mainSearchForm');
+    if (!f) { return; }
+    show('search');
+    f.querySelector('.q').value = v;
+    f.querySelector('.field').value = '全文';
+    doSearch(f);
+  });
+
+  /* =======================================================================
+     四、会自己动的系统：后期偶尔替你检索、改文案、把页面弄坏
+     ======================================================================= */
+  setInterval(function () {
+    var lv = decayLevel();
+    if (lv < 2) { return; }
+
+    /* 系统时间偶尔错乱 */
+    if (lv >= 2 && Math.random() < 0.12) {
+      var el = document.getElementById('sysClock');
+      if (el) {
+        var old = el.textContent;
+        el.textContent = '系统时间：1980-08-04 05:59';
+        setTimeout(function () { el.textContent = old; }, 1400);
+      }
+    }
+
+    /* 后期：搜索框提示语变了 */
+    if (lv >= 3) {
+      var q = document.querySelector('#mainSearchForm .q');
+      if (q) { q.setAttribute('placeholder', '你在找谁？'); }
+    }
+
+    /* 后期：偶尔自己替你输一个词并检索 */
+    if (lv >= 3 && Math.random() < 0.12) {
+      var view = document.getElementById('view-search');
+      var form = document.getElementById('mainSearchForm');
+      if (view && !view.hidden && form) {
+        var inp = form.querySelector('.q');
+        if (inp && !inp.value && document.activeElement !== inp) {
+          inp.value = '陈望';
+          setTimeout(function () { doSearch(form); }, 400);
+        }
+      }
+    }
+  }, 20000);
 
   /* ---------- 启动 ---------- */
   renderClock();
